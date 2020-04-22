@@ -1,23 +1,23 @@
-interface shiftTime {
+export interface shiftTime {
     hours: number,
     minutes: number
 }
 
-interface shiftParticipant {
+export interface shiftParticipant {
     name: string,
     shiftStartTime: shiftTime,
     shiftEndTime: shiftTime,
     goodShiftRatioBonus?: true
 }
 
-interface shiftList {
+export interface shiftList {
     generatedTimestamp?: string,
     firstShiftStartTime: shiftTime,
     lastShiftEndTime: shiftTime,
     participants: shiftParticipant[]
 }
 
-interface shiftCandidate {
+export interface shiftCandidate {
     name: string,
     shiftChancePercent: number
 }
@@ -103,8 +103,6 @@ function whoGetsGoodShifts(shiftList: shiftList, shiftListHistory: shiftList[]):
             possibleCandidates.splice(candidateIndex);
         }
     });
-
-    console.log(possibleCandidates);
 
     // Select good shift candidates and return their names in an array.
     if (possibleCandidates.length > 2) {
@@ -206,83 +204,3 @@ export default function generateShifts(shiftList: shiftList, shiftListHistory: s
 
     return newShiftList;
 }
-
-// TESTS STARTS FROM HERE!
-const testShiftList: shiftList = {
-    firstShiftStartTime: { hours: 0, minutes: 0 },
-    lastShiftEndTime: { hours: 5, minutes: 0 },
-    participants: [
-        {
-            name: "Nordström",
-            shiftStartTime: { hours: -1, minutes: -1 },
-            shiftEndTime: { hours: -1, minutes: -1 }
-        },
-        {
-            name: "Kivi",
-            shiftStartTime: { hours: -1, minutes: -1 },
-            shiftEndTime: { hours: -1, minutes: -1 }
-        },
-        {
-            name: "Tuominen",
-            shiftStartTime: { hours: -1, minutes: -1 },
-            shiftEndTime: { hours: -1, minutes: -1 }
-        },
-        {
-            name: "Lehtimäki",
-            shiftStartTime: { hours: -1, minutes: -1 },
-            shiftEndTime: { hours: -1, minutes: -1 }
-        },
-        {
-            name: "Kulmala",
-            shiftStartTime: { hours: -1, minutes: -1 },
-            shiftEndTime: { hours: -1, minutes: -1 }
-        },
-        // {
-        //     name: "Ikävalko",
-        //     shiftStartTime: { hours: -1, minutes: -1 },
-        //     shiftEndTime: { hours: -1, minutes: -1 }
-        // },
-        // {
-        //     name: "Koivunen",
-        //     shiftStartTime: { hours: -1, minutes: -1 },
-        //     shiftEndTime: { hours: -1, minutes: -1 }
-        // }
-    ]
-};
-const testHistory: shiftList[] = [generateShifts(testShiftList, [], true)];
-console.log(testHistory[0].participants.map(({ name }) => name));
-
-testHistory.push(generateShifts(testHistory[0], testHistory));
-console.log(testHistory[1].participants.map(({ name }) => name));
-
-testHistory.push(generateShifts(testHistory[1], testHistory));
-console.log(testHistory[2].participants.map(({ name }) => name));
-
-testShiftList.participants.splice(3, 1, {
-    name: "Matikainen",
-    shiftStartTime: { hours: -1, minutes: -1 },
-    shiftEndTime: { hours: -1, minutes: -1 }
-});
-testHistory.push(generateShifts(testShiftList, testHistory));
-console.log(testHistory[3].participants.map(({ name }) => name));
-
-testHistory.push(generateShifts(testHistory[3], testHistory));
-console.log(testHistory[4].participants.map(({ name }) => name));
-
-testHistory.push(generateShifts(testHistory[4], testHistory));
-console.log(testHistory[5].participants.map(({ name }) => name));
-
-testHistory.push(generateShifts(testHistory[5], testHistory));
-console.log(testHistory[6].participants.map(({ name }) => name));
-
-testHistory.push(generateShifts(testHistory[6], testHistory));
-console.log(testHistory[7].participants.map(({ name }) => name));
-
-testHistory.push(generateShifts(testHistory[7], testHistory));
-console.log(testHistory[8].participants.map(({ name }) => name));
-
-testHistory.push(generateShifts(testHistory[8], testHistory));
-console.log(testHistory[9].participants.map(({ name }) => name));
-
-testHistory.push(generateShifts(testHistory[9], testHistory));
-console.log(testHistory[10].participants.map(({ name }) => name));
