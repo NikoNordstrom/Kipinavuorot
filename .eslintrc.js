@@ -8,7 +8,8 @@ module.exports = {
     extends: [
         "eslint:recommended",
         "plugin:react/recommended",
-        "plugin:@typescript-eslint/eslint-recommended"
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
     ],
     globals: {
         "Atomics": "readonly",
@@ -46,6 +47,8 @@ module.exports = {
         "object-curly-spacing": [
             "error",
             "always"
-        ]
+        ],
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/no-use-before-define": "off"
     }
 };

@@ -1,28 +1,28 @@
-export interface shiftTime {
-    hours: number,
-    minutes: number
+export interface ShiftTime {
+    hours: number;
+    minutes: number;
 }
 
-export interface shiftParticipant {
-    name: string,
-    shiftStartTime: shiftTime,
-    shiftEndTime: shiftTime,
-    goodShiftRatioBonus?: true
+export interface ShiftParticipant {
+    name: string;
+    shiftStartTime: ShiftTime;
+    shiftEndTime: ShiftTime;
+    goodShiftRatioBonus?: true;
 }
 
-export interface shiftList {
-    generatedTimestamp?: string,
-    firstShiftStartTime: shiftTime,
-    lastShiftEndTime: shiftTime,
-    participants: shiftParticipant[]
+export interface ShiftList {
+    firstShiftStartTime: ShiftTime;
+    lastShiftEndTime: ShiftTime;
+    participants: ShiftParticipant[];
+    shiftsGeneratedTimestamp?: string;
 }
 
-interface shiftCandidate {
-    name: string,
-    shiftChancePercent: number
+interface ShiftCandidate {
+    name: string;
+    shiftChancePercent: number;
 }
 
-function generateEmptyShifts(shiftList: shiftList): shiftParticipant[] {
+function generateEmptyShifts(shiftList: ShiftList): ShiftParticipant[] {
     if (shiftList.participants.length < 1) return [];
 
     const firstShiftStartTime = new Date();
@@ -38,9 +38,9 @@ function generateEmptyShifts(shiftList: shiftList): shiftParticipant[] {
     const fullShiftLengthHours = Math.abs(firstShiftStartTime.getTime() - lastShiftEndTime.getTime()) / 1000 / 60 / 60;
     const shiftDurationMinutes = fullShiftLengthHours / shiftList.participants.length * 60;
 
-    // Create shiftParticipant array that includes all shift start and end times, but leave participant names empty.
+    // Create ShiftParticipant array that includes all shift start and end times, but leave participant names empty.
     return new Array(shiftList.participants.length).fill(null).map((value, index) => {
-        let lastShiftEndTimeMinutes = (firstShiftStartTime.getHours() * 60 + firstShiftStartTime.getMinutes()) + shiftDurationMinutes * index;
+        const lastShiftEndTimeMinutes = (firstShiftStartTime.getHours() * 60 + firstShiftStartTime.getMinutes()) + shiftDurationMinutes * index;
         return {
             name: "",
             shiftStartTime: {
@@ -55,7 +55,7 @@ function generateEmptyShifts(shiftList: shiftList): shiftParticipant[] {
     });
 }
 
-function generateRandomShifts(shiftList: shiftList): shiftParticipant[] {
+function generateRandomShifts(shiftList: ShiftList): ShiftParticipant[] {
     const participantsNames = shiftList.participants.map(({ name }) => name);
     const emptyShiftList = generateEmptyShifts(shiftList);
     // Add all of the participants names to randomly selected participants with shifts.
@@ -67,8 +67,8 @@ function generateRandomShifts(shiftList: shiftList): shiftParticipant[] {
     });
 }
 
-function whoGetsGoodShifts(shiftList: shiftList, shiftListHistory: shiftList[]): string[] {
-    const possibleCandidates: shiftCandidate[] = [];
+function whoGetsGoodShifts(shiftList: ShiftList, shiftListHistory: ShiftList[]): string[] {
+    const possibleCandidates: ShiftCandidate[] = [];
 
     // Calculate shiftChancePercent for every participant and populate possibleCandidates.
     shiftList.participants.forEach(participant => {
@@ -129,8 +129,8 @@ function whoGetsGoodShifts(shiftList: shiftList, shiftListHistory: shiftList[]):
     ];
 }
 
-function whoGetsThisShift(theShiftStartTime: shiftTime, participantNames: string[], shiftListHistory: shiftList[]): string {
-    const possibleCandidates: shiftCandidate[] = [];
+function whoGetsThisShift(theShiftStartTime: ShiftTime, participantNames: string[], shiftListHistory: ShiftList[]): string {
+    const possibleCandidates: ShiftCandidate[] = [];
 
     participantNames.forEach(participantName => {
         let totalNumberOfPreviousShifts = 0;
@@ -165,12 +165,12 @@ function whoGetsThisShift(theShiftStartTime: shiftTime, participantNames: string
     return possibleCandidates[Math.floor(Math.random() * possibleCandidates.length)].name;
 }
 
-export default function generateShifts(shiftList: shiftList, shiftListHistory: shiftList[], randomShifts?: boolean): shiftList {
+export default function generateShifts(shiftList: ShiftList, shiftListHistory: ShiftList[], randomShifts?: boolean): ShiftList {
     // This makes a new copy of shiftList so that changes won't affect the original object.
-    const newShiftList: shiftList = {
+    const newShiftList: ShiftList = {
         ...shiftList,
         participants: generateEmptyShifts(shiftList),
-        generatedTimestamp: new Date().toLocaleString("fi-FI")
+        shiftsGeneratedTimestamp: new Date().toLocaleString("fi-FI")
     };
 
     if (randomShifts) {

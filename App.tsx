@@ -1,37 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text } from "react-native";
-import { shiftList } from "./shift-generator";
-import ShiftList from "./components/ShiftList";
+import AsyncStorage from "@react-native-community/async-storage";
+import { ShiftList } from "./shift-generator";
+import FlatShiftList from "./components/FlatShiftList";
 
 export default function App() {
-    const testShiftList: shiftList = {
-        firstShiftStartTime: {
-            hours: 21,
-            minutes: 0
-        },
-        lastShiftEndTime: {
-            hours: 3,
-            minutes: 0
-        },
-        participants: [
-            {
-                name: "Nordström",
-                shiftStartTime: { hours: 21, minutes: 0 },
-                shiftEndTime: { hours: 22, minutes: 0 }
-            },
-            {
-                name: "Tuominen",
-                shiftStartTime: { hours: 22, minutes: 0 },
-                shiftEndTime: { hours: 23, minutes: 0 }
-            }
-        ]
+    const initialShiftList: ShiftList = {
+        firstShiftStartTime: { hours: -1, minutes: -1 },
+        lastShiftEndTime: { hours: -1, minutes: -1 },
+        participants: []
     };
-    const [shiftList, updateShiftList] = useState(testShiftList);
+    const [shiftList, setShiftList] = useState(initialShiftList);
+    useEffect(() => {
+        AsyncStorage.getItem("shiftlist").then((shiftListStringFromStorage) => {
+            if (!shiftListStringFromStorage) return;
+            setShiftList(JSON.parse(shiftListStringFromStorage));
+        });
+    }, []);
+    console.log(shiftList);
     return (
         <View style={styles.background}>
             <Text style={styles.heading}>Kipinävuorot</Text>
             <View style={styles.page}>
-                <ShiftList {...shiftList} />
+                {
+                    shiftList && shiftList.participants.length > 0
+                        ? <FlatShiftList {...shiftList} />
+                        : null
+                }
             </View>
         </View>
     );

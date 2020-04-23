@@ -1,11 +1,11 @@
 import React from "react";
 import { StyleSheet, FlatList, TouchableOpacity, Text, View, ScrollView } from "react-native";
-import { shiftTime, shiftParticipant, shiftList } from "../shift-generator";
+import { ShiftTime, ShiftParticipant, ShiftList } from "../shift-generator";
 
-function ShiftListItem(participant: shiftParticipant) {
+function ShiftListItem(participant: ShiftParticipant) {
     const { name, shiftStartTime, shiftEndTime } = participant;
-    const shiftTimeToString = (shiftTime: shiftTime) => {
-        const { hours, minutes } = shiftTime;
+    const shiftTimeToString = (shiftTimeObject: ShiftTime) => {
+        const { hours, minutes } = shiftTimeObject;
         if (hours === -1 && minutes === -1) return "00:00";
         return `${hours < 10 ? `0${hours}` : hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
     };
@@ -20,7 +20,7 @@ function ShiftListItem(participant: shiftParticipant) {
     );
 }
 
-export default function ShiftList(props: shiftList) {
+export default function FlatShiftList(props: ShiftList) {
     const { participants } = props;
     return (
         <FlatList
