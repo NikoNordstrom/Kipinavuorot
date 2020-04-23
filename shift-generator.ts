@@ -17,7 +17,7 @@ export interface shiftList {
     participants: shiftParticipant[]
 }
 
-export interface shiftCandidate {
+interface shiftCandidate {
     name: string,
     shiftChancePercent: number
 }
