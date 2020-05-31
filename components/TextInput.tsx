@@ -7,11 +7,12 @@ interface TextInputProps {
     defaultValue?: string;
     style?: ViewStyle;
     editable?: boolean;
+    maxLength?: number;
     onChangeText?: (text: string) => void;
 }
 
 export default function TextInput(props: TextInputProps) {
-    const { labelText, placeholder, defaultValue, style, editable, onChangeText } = props;
+    const { labelText, placeholder, defaultValue, style, editable, maxLength, onChangeText } = props;
     return (
         <View style={[styles.container, style]}>
             <Text style={styles.label}>{labelText}</Text>
@@ -22,6 +23,7 @@ export default function TextInput(props: TextInputProps) {
                 autoCorrect={false}
                 autoCompleteType="name"
                 editable={editable}
+                maxLength={maxLength}
                 onChangeText={onChangeText} />
         </View>
     );

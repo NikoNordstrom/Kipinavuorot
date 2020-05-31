@@ -6,23 +6,26 @@ import { ShiftList, ShiftTime } from "./shift-generator";
 import FlatShiftList from "./components/FlatShiftList";
 import ShiftListUpdateTools from "./components/ShiftListUpdateTools";
 
-const initialShiftList: ShiftList = {
-    firstShiftStartTime: { hours: 0, minutes: 0 },
-    lastShiftEndTime: { hours: 0, minutes: 0 },
-    participants: []
-};
-
 export default function App() {
-    const [shiftList, setShiftList] = useState(initialShiftList);
+    const emptyShiftList: ShiftList = {
+        firstShiftStartTime: { hours: 0, minutes: 0 },
+        lastShiftEndTime: { hours: 0, minutes: 0 },
+        participants: []
+    };
+
+    const [shiftList, setShiftList] = useState(emptyShiftList);
+
     useEffect(() => {
         AsyncStorage.getItem("shiftlist").then((shiftListStringFromStorage) => {
             if (!shiftListStringFromStorage) return;
             setShiftList(JSON.parse(shiftListStringFromStorage));
         });
     }, []);
+
     useEffect(() => {
         AsyncStorage.setItem("shiftlist", JSON.stringify(shiftList));
     });
+
     const updateShiftListTimes = (firstShiftStartTime: ShiftTime, lastShiftEndTime: ShiftTime) => {
         if (
             JSON.stringify(shiftList.firstShiftStartTime) === JSON.stringify(firstShiftStartTime) &&
@@ -34,10 +37,7 @@ export default function App() {
             lastShiftEndTime
         });
     };
-    const { hours: startHours, minutes: startMinutes } = shiftList.firstShiftStartTime;
-    const firstShiftStartTimeText = `${startHours < 10 ? "0": ""}${startHours}:${startMinutes < 10 ? "0" : ""}${startMinutes}`;
-    const { hours: endHours, minutes: endMinutes } = shiftList.lastShiftEndTime;
-    const lastShiftEndTimeText = `${endHours < 10 ? "0": ""}${endHours}:${endMinutes < 10 ? "0" : ""}${endMinutes}`;
+
     return (
         <View style={styles.background}>
             {console.log(shiftList)}
@@ -47,8 +47,7 @@ export default function App() {
                     shiftList && shiftList.participants.length > 0
                         ? <FlatShiftList {...shiftList} />
                         : <ShiftListUpdateTools
-                            defaultStartTimeText={firstShiftStartTimeText}
-                            defaultEndTimeText={lastShiftEndTimeText}
+                            shiftList={shiftList}
                             updateShiftListTimes={updateShiftListTimes} />
                 }
             </View>

@@ -30,14 +30,17 @@ export default function ShiftTimeInputs(props: ShiftTimeInputsProps) {
                     labelText="Alkaa"
                     placeholder={placeholder}
                     defaultValue={firstShiftStartTimeText}
-                    style={{ marginRight: 15 }}
+                    style={{ ...styles.textInput, marginRight: 15 }}
                     editable={!done}
+                    maxLength={5}
                     onChangeText={onFirstShiftStartTimeChangeText} />
                 <TextInput
                     labelText="Päättyy"
                     placeholder={placeholder}
                     defaultValue={lastShiftEndTimeText}
+                    style={styles.textInput}
                     editable={!done}
+                    maxLength={5}
                     onChangeText={onLastShiftEndTimeChangeText} />
             </View>
             {
@@ -53,5 +56,8 @@ const styles = StyleSheet.create({
     shiftTimeInputs: {
         flexDirection: "row",
         marginBottom: 15
+    },
+    textInput: {
+        flex: 0.5
     }
 });
