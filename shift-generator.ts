@@ -57,7 +57,8 @@ function generateEmptyShifts(shiftList: ShiftList): ShiftParticipant[] {
 
 function generateRandomShifts(shiftList: ShiftList): ShiftParticipant[] {
     const participantsNames = shiftList.participants.map(({ name }) => name);
-    const emptyShiftList = generateEmptyShifts(shiftList);
+    let emptyShiftList = generateEmptyShifts(shiftList);
+    emptyShiftList = roundShiftMinutesToFive(emptyShiftList);
     // Add all of the participants names to randomly selected participants with shifts.
     return emptyShiftList.map(shiftParticipant => {
         const participantNameIndex = Math.floor(Math.random() * participantsNames.length);
@@ -165,6 +166,19 @@ function whoGetsThisShift(theShiftStartTime: ShiftTime, participantNames: string
     return possibleCandidates[Math.floor(Math.random() * possibleCandidates.length)].name;
 }
 
+function roundShiftMinutesToFive(shiftParticipants: ShiftParticipant[]): ShiftParticipant[] {
+    shiftParticipants.forEach((participant, index) => {
+        if (index > 0) {
+            const shiftStartTime = { ...shiftParticipants[index - 1].shiftEndTime };
+            shiftParticipants[index].shiftStartTime = shiftStartTime;
+        }
+        if (index === shiftParticipants.length - 1) return;
+        const shiftEndTimeExtraMinutes = participant.shiftEndTime.minutes % 5;
+        shiftParticipants[index].shiftEndTime.minutes -= shiftEndTimeExtraMinutes;
+    });
+    return shiftParticipants;
+}
+
 export default function generateShifts(shiftList: ShiftList, shiftListHistory: ShiftList[], randomShifts?: boolean): ShiftList {
     // This makes a new copy of shiftList so that changes won't affect the original object.
     const newShiftList: ShiftList = {
@@ -201,6 +215,8 @@ export default function generateShifts(shiftList: ShiftList, shiftListHistory: S
         });
         newShiftList.participants[newShiftIndex].name = thisShiftParticipantName;
     });
+
+    newShiftList.participants = roundShiftMinutesToFive(newShiftList.participants);
 
     return newShiftList;
 }
