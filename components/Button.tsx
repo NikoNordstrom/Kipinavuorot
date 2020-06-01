@@ -1,16 +1,17 @@
 import React from "react";
-import { TouchableHighlight, View, Text, StyleSheet } from "react-native";
+import { TouchableHighlight, ViewStyle, View, Text, StyleSheet } from "react-native";
 
 interface ButtonProps {
     labelText: string;
     onPress?: () => void;
+    style?: ViewStyle;
 }
 
 export default function Button(props: ButtonProps) {
-    const { labelText, onPress } = props;
+    const { labelText, onPress, style } = props;
     return (
         <TouchableHighlight
-            style={styles.highlight}
+            style={{ ...style, ...styles.highlight }}
             onPress={onPress}>
             <View style={styles.button}>
                 <Text style={styles.labelText}>{labelText}</Text>

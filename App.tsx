@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 
-import { ShiftList, ShiftTime } from "./shift-generator";
+import { ShiftList, ShiftTime, ShiftParticipant } from "./shift-generator";
 import FlatShiftList from "./components/FlatShiftList";
-import ShiftListUpdateTools from "./components/ShiftListUpdateTools";
+import UpdateShiftListTimes from "./components/UpdateShiftListTimes";
+import AddShiftParticipant from "./components/AddShiftParticipant";
 
 export default function App() {
     const emptyShiftList: ShiftList = {
@@ -14,6 +15,7 @@ export default function App() {
     };
 
     const [shiftList, setShiftList] = useState(emptyShiftList);
+    const [shiftListTimesUpdated, setShiftListTimesUpdated] = useState(false);
 
     useEffect(() => {
         AsyncStorage.getItem("shiftlist").then((shiftListStringFromStorage) => {
@@ -27,6 +29,7 @@ export default function App() {
     });
 
     const updateShiftListTimes = (firstShiftStartTime: ShiftTime, lastShiftEndTime: ShiftTime) => {
+        setShiftListTimesUpdated(true);
         if (
             JSON.stringify(shiftList.firstShiftStartTime) === JSON.stringify(firstShiftStartTime) &&
             JSON.stringify(shiftList.lastShiftEndTime) === JSON.stringify(lastShiftEndTime)
@@ -38,17 +41,30 @@ export default function App() {
         });
     };
 
+    const updateShiftListParticipants = (shiftParticipants: ShiftParticipant[]) => {
+        setShiftList({ ...shiftList, participants: shiftParticipants });
+    };
+
     return (
         <View style={styles.background}>
             {console.log(shiftList)}
             <Text style={styles.heading}>Kipinävuorot</Text>
             <View style={styles.page}>
+                <UpdateShiftListTimes
+                    shiftList={shiftList}
+                    updateShiftListTimes={updateShiftListTimes}
+                    style={{ marginBottom: 15 }} />
+                {
+                    shiftListTimesUpdated
+                        ? <AddShiftParticipant
+                            shiftList={shiftList}
+                            updateShiftListParticipants={updateShiftListParticipants}
+                            style={{ marginBottom: 15 }} />
+                        : null
+                }
                 {
                     shiftList && shiftList.participants.length > 0
-                        ? <FlatShiftList {...shiftList} />
-                        : <ShiftListUpdateTools
-                            shiftList={shiftList}
-                            updateShiftListTimes={updateShiftListTimes} />
+                        ? <FlatShiftList {...shiftList} /> : null
                 }
             </View>
         </View>

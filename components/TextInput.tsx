@@ -1,8 +1,9 @@
 import React from "react";
 import { View, Text, TextInput as BaseTextInput, StyleSheet, ViewStyle } from "react-native";
 
-interface TextInputProps {
+export interface TextInputProps {
     labelText: string;
+    value?: string;
     placeholder?: string;
     defaultValue?: string;
     style?: ViewStyle;
@@ -12,12 +13,13 @@ interface TextInputProps {
 }
 
 export default function TextInput(props: TextInputProps) {
-    const { labelText, placeholder, defaultValue, style, editable, maxLength, onChangeText } = props;
+    const { labelText, value, placeholder, defaultValue, style, editable, maxLength, onChangeText } = props;
     return (
         <View style={[styles.container, style]}>
             <Text style={styles.label}>{labelText}</Text>
             <BaseTextInput
                 style={styles.baseTextInput}
+                value={value}
                 placeholder={placeholder}
                 defaultValue={defaultValue}
                 autoCorrect={false}
@@ -44,6 +46,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 10,
         fontSize: 20,
-        fontFamily: "Quicksand-Regular"
+        fontFamily: "Quicksand-Regular",
+        includeFontPadding: false,
+        textAlignVertical: "center"
     }
 });

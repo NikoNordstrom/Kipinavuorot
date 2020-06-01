@@ -4,11 +4,13 @@ import { ShiftTime, ShiftParticipant, ShiftList } from "../shift-generator";
 
 function ShiftListItem(participant: ShiftParticipant) {
     const { name, shiftStartTime, shiftEndTime } = participant;
+
     const shiftTimeToString = (shiftTimeObject: ShiftTime) => {
         const { hours, minutes } = shiftTimeObject;
         if (hours === -1 && minutes === -1) return "00:00";
         return `${hours < 10 ? `0${hours}` : hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
     };
+
     return (
         <TouchableOpacity style={styles.listItem}>
             <Text style={styles.listItemTime}>{shiftTimeToString(shiftStartTime)}</Text>
@@ -22,6 +24,7 @@ function ShiftListItem(participant: ShiftParticipant) {
 
 export default function FlatShiftList(props: ShiftList) {
     const { participants } = props;
+
     return (
         <FlatList
             data={participants}
