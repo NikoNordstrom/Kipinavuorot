@@ -2,10 +2,16 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 
-import { ShiftList, ShiftTime, ShiftParticipant } from "./shift-generator";
+import generateShifts, {
+    ShiftList,
+    ShiftTime,
+    ShiftParticipant
+} from "./shift-generator";
+
 import FlatShiftList from "./components/FlatShiftList";
 import UpdateShiftListTimes from "./components/UpdateShiftListTimes";
 import AddShiftParticipant from "./components/AddShiftParticipant";
+import Button from "./components/Button";
 
 export default function App() {
     const emptyShiftList: ShiftList = {
@@ -16,6 +22,7 @@ export default function App() {
 
     const [shiftList, setShiftList] = useState(emptyShiftList);
     const [shiftListTimesUpdated, setShiftListTimesUpdated] = useState(false);
+    const [shiftListReady, setShiftListReady] = useState(false);
 
     useEffect(() => {
         AsyncStorage.getItem("shiftlist").then((shiftListStringFromStorage) => {
@@ -45,26 +52,44 @@ export default function App() {
         setShiftList({ ...shiftList, participants: shiftParticipants });
     };
 
+    const updateShiftList = () => {
+        setShiftList(generateShifts(shiftList));
+    };
+
     return (
         <View style={styles.background}>
-            {console.log(shiftList)}
+            {
+                console.log(shiftList)
+            }
             <Text style={styles.heading}>Kipinävuorot</Text>
             <View style={styles.page}>
-                <UpdateShiftListTimes
-                    shiftList={shiftList}
-                    updateShiftListTimes={updateShiftListTimes}
-                    style={{ marginBottom: 15 }} />
                 {
-                    shiftListTimesUpdated
+                    !shiftListReady
+                        ? <UpdateShiftListTimes
+                            shiftList={shiftList}
+                            updateShiftListTimes={updateShiftListTimes}
+                            style={{ marginBottom: 15 }} />
+                        : null
+                }
+                {
+                    !shiftListReady && shiftListTimesUpdated
                         ? <AddShiftParticipant
                             shiftList={shiftList}
                             updateShiftListParticipants={updateShiftListParticipants}
+                            setShiftListReady={() => setShiftListReady(true)}
                             style={{ marginBottom: 15 }} />
                         : null
                 }
                 {
                     shiftList && shiftList.participants.length > 0
                         ? <FlatShiftList {...shiftList} /> : null
+                }
+                {
+                    shiftListReady
+                        ? <Button
+                            labelText="Luo kipinävuorot"
+                            onPress={updateShiftList} />
+                        : null
                 }
             </View>
         </View>

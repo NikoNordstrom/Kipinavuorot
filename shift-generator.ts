@@ -179,7 +179,7 @@ function roundShiftMinutesToFive(shiftParticipants: ShiftParticipant[]): ShiftPa
     return shiftParticipants;
 }
 
-export default function generateShifts(shiftList: ShiftList, shiftListHistory: ShiftList[], randomShifts?: boolean): ShiftList {
+export default function generateShifts(shiftList: ShiftList, shiftListHistory?: ShiftList[], randomShifts?: boolean): ShiftList {
     // This makes a new copy of shiftList so that changes won't affect the original object.
     const newShiftList: ShiftList = {
         ...shiftList,
@@ -187,7 +187,7 @@ export default function generateShifts(shiftList: ShiftList, shiftListHistory: S
         shiftsGeneratedTimestamp: new Date().toLocaleString("fi-FI")
     };
 
-    if (randomShifts) {
+    if (randomShifts || !shiftListHistory || shiftListHistory.length < 1) {
         newShiftList.participants = generateRandomShifts(shiftList);
         return newShiftList;
     }

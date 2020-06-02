@@ -3,14 +3,17 @@ import { TouchableHighlight, ViewStyle, View, Text, StyleSheet } from "react-nat
 
 interface ButtonProps {
     labelText: string;
-    onPress?: () => void;
+    disabled?: boolean;
     style?: ViewStyle;
+    onPress?: () => void;
 }
 
 export default function Button(props: ButtonProps) {
-    const { labelText, onPress, style } = props;
+    const { labelText, disabled, style, onPress } = props;
     return (
         <TouchableHighlight
+            disabled={disabled}
+            touchSoundDisabled={disabled}
             style={{ ...style, ...styles.highlight }}
             onPress={onPress}>
             <View style={styles.button}>

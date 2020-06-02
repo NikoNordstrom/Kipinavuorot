@@ -7,11 +7,12 @@ import { ShiftList, ShiftParticipant } from "../shift-generator";
 interface AddShiftParticipantProps {
     shiftList: ShiftList;
     updateShiftListParticipants: (shiftParticipants: ShiftParticipant[]) => void;
+    setShiftListReady: () => void;
     style?: ViewStyle;
 }
 
 export default function AddShiftParticipant(props: AddShiftParticipantProps) {
-    const { shiftList, updateShiftListParticipants, style } = props;
+    const { shiftList, updateShiftListParticipants, setShiftListReady, style } = props;
     const [participantName, setParticipantName] = useState("");
 
     const addParticipant = () => {
@@ -26,17 +27,31 @@ export default function AddShiftParticipant(props: AddShiftParticipantProps) {
         
         setParticipantName("");
     };
+
+    const doneButtonDisabled = shiftList.participants.length <= 1;
     
     return (
         <View style={style}>
             <TextInput
-                labelText="Osallistujan nimi"
+                labelText="Kipinävuoroihin osallistuvan nimi"
                 value={participantName}
-                style={{ marginBottom: 15 }}
-                onChangeText={(text) => setParticipantName(text)} />
-            <Button
-                labelText="Lisää osallistuja"
-                onPress={addParticipant} />
+                onChangeText={(text) => setParticipantName(text)}
+                style={{ marginBottom: 15 }} />
+            <View style={{ flexDirection: "row" }}>
+                <Button 
+                    labelText="Valmis"
+                    disabled={doneButtonDisabled}
+                    onPress={() => setShiftListReady()}
+                    style={{
+                        flex: 0.5,
+                        marginRight: 15,
+                        opacity: doneButtonDisabled ? 0.6 : 1
+                    }} />
+                <Button
+                    labelText="Lisää"
+                    onPress={addParticipant}
+                    style={{ flex: 0.5 }} />
+            </View>
         </View>
     );
 }
