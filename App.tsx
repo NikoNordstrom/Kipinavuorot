@@ -8,6 +8,7 @@ import generateShifts, {
     ShiftParticipant
 } from "./shift-generator";
 
+import ViewPager from "./components/ViewPager";
 import FlatShiftList from "./components/FlatShiftList";
 import UpdateShiftListTimes from "./components/UpdateShiftListTimes";
 import AddShiftParticipant from "./components/AddShiftParticipant";
@@ -59,39 +60,44 @@ export default function App() {
     return (
         <View style={styles.background}>
             {
-                console.log(shiftList)
+                [shiftList, "\n"].forEach(v => console.log(v))
             }
             <Text style={styles.heading}>Kipinävuorot</Text>
-            <View style={styles.page}>
-                {
-                    !shiftListReady
-                        ? <UpdateShiftListTimes
-                            shiftList={shiftList}
-                            updateShiftListTimes={updateShiftListTimes}
-                            style={{ marginBottom: 15 }} />
-                        : null
-                }
-                {
-                    !shiftListReady && shiftListTimesUpdated
-                        ? <AddShiftParticipant
-                            shiftList={shiftList}
-                            updateShiftListParticipants={updateShiftListParticipants}
-                            setShiftListReady={() => setShiftListReady(true)}
-                            style={{ marginBottom: 15 }} />
-                        : null
-                }
-                {
-                    shiftList && shiftList.participants.length > 0
-                        ? <FlatShiftList {...shiftList} /> : null
-                }
-                {
-                    shiftListReady
-                        ? <Button
-                            labelText="Luo kipinävuorot"
-                            onPress={updateShiftList} />
-                        : null
-                }
-            </View>
+            <ViewPager style={styles.viewPager}>
+                <View key="1">
+                    {
+                        !shiftListReady
+                            ? <UpdateShiftListTimes
+                                shiftList={shiftList}
+                                updateShiftListTimes={updateShiftListTimes}
+                                style={{ marginBottom: 15 }} />
+                            : null
+                    }
+                    {
+                        !shiftListReady && shiftListTimesUpdated
+                            ? <AddShiftParticipant
+                                shiftList={shiftList}
+                                updateShiftListParticipants={updateShiftListParticipants}
+                                setShiftListReady={() => setShiftListReady(true)}
+                                style={{ marginBottom: 15 }} />
+                            : null
+                    }
+                    {
+                        shiftList && shiftList.participants.length > 0
+                            ? <FlatShiftList {...shiftList} /> : null
+                    }
+                    {
+                        shiftListReady
+                            ? <Button
+                                labelText="Luo kipinävuorot"
+                                onPress={updateShiftList} />
+                            : null
+                    }
+                </View>
+                <View key="2" style={{ flex: 1 }}>
+                    <Text style={styles.noPreviousShiftListsFound}>Aiempia kipinävuoroja ei löytynyt.</Text>
+                </View>
+            </ViewPager>
         </View>
     );
 }
@@ -106,14 +112,23 @@ const styles = StyleSheet.create({
     heading: {
         marginTop: 10,
         marginLeft: 5,
-        fontSize: 30,
+        marginBottom: 10,
+        fontSize: 25,
         fontFamily: "Quicksand-Bold"
     },
-    page: {
-        marginTop: 15,
+    viewPager: {
         padding: 15,
+        paddingTop: 0,
         flex: 1,
         borderRadius: 10,
         backgroundColor: "white"
+    },
+    noPreviousShiftListsFound: {
+        flex: 1,
+        marginTop: "40%",
+        textAlign: "center",
+        opacity: 0.3,
+        fontSize: 25,
+        fontFamily: "Quicksand-Regular"
     }
 });

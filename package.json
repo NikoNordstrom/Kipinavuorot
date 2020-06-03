@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.9.0",
+    "@react-native-community/viewpager": "^4.0.0",
     "react": "16.11.0",
     "react-native": "0.62.2"
   },
