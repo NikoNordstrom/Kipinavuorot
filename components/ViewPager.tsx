@@ -1,4 +1,4 @@
-import React, { ReactChildren, useState } from "react";
+import React, { ReactChildren, useState, useEffect } from "react";
 import { View, ViewStyle, Text, StyleSheet } from "react-native";
 import BaseViewPager, {
     ViewPagerOnPageSelectedEventData,
@@ -7,6 +7,9 @@ import BaseViewPager, {
 
 interface ViewPagerProps {
     children: ReactChildren;
+    headerInfo: string;
+    firstPageHeaderInfo: () => string;
+    updateHeaderInfo: (text: string) => void;
     style?: ViewStyle;
 }
 
@@ -19,7 +22,7 @@ interface State {
 }
 
 export default function ViewPager(props: ViewPagerProps) {
-    const { children, style } = props;
+    const { children, headerInfo, firstPageHeaderInfo, updateHeaderInfo, style } = props;
 
     const [state, setState] = useState<State>({
         page: 0,
@@ -32,6 +35,7 @@ export default function ViewPager(props: ViewPagerProps) {
     const viewPager: React.Ref<BaseViewPager> = React.createRef();
 
     const onPageSelected = (e: ViewPagerOnPageSelectedEventData) => {
+        if (state.page === e.position) return;
         setState({
             ...state,
             page: e.position
@@ -54,16 +58,21 @@ export default function ViewPager(props: ViewPagerProps) {
 
     const underlineOffset = state.progress.offset === 0 ? state.page : state.progress.offset;
 
+    useEffect(() => {
+        const newHeaderInfo = state.page === 0 ? firstPageHeaderInfo() : "";
+        if (newHeaderInfo === headerInfo) return;
+        if (newHeaderInfo !== "00:00 - 00:00") updateHeaderInfo(newHeaderInfo);
+    });
+
     return (
         <View style={style}>
-            {console.log(state)}
             <View style={styles.tabsHeaderContainer}>
                 <Text
                     style={[styles.tabHeader, state.page === 0 ? { fontFamily: "Quicksand-Bold" } : null]}
                     onPress={() => goToPage(0)}>Nykyinen</Text>
                 <Text
                     style={[styles.tabHeader, state.page === 1 ? { fontFamily: "Quicksand-Bold" } : null]}
-                    onPress={() => goToPage(1)}>Vanhat</Text>
+                    onPress={() => goToPage(1)}>Aiemmat</Text>
             </View>
             <View style={[styles.tabsUnderline, { left: `${underlineOffset * 50}%` }]} />
             <BaseViewPager

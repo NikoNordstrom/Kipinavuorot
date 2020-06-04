@@ -14,6 +14,35 @@ import UpdateShiftListTimes from "./components/UpdateShiftListTimes";
 import AddShiftParticipant from "./components/AddShiftParticipant";
 import Button from "./components/Button";
 
+export interface ShiftTimeTexts {
+    firstStart: string;
+    lastEnd: string;
+}
+
+function shiftListTimesToString(firstShiftStartTime: ShiftTime, lastShiftEndTime: ShiftTime): ShiftTimeTexts {
+    const { hours: startHours, minutes: startMinutes } = firstShiftStartTime;
+    const { hours: endHours, minutes: endMinutes } = lastShiftEndTime;
+
+    const firstShiftStartTimeText = `${startHours < 10 ? "0": ""}${startHours}:${startMinutes < 10 ? "0" : ""}${startMinutes}`;
+    const lastShiftEndTimeText = `${endHours < 10 ? "0": ""}${endHours}:${endMinutes < 10 ? "0" : ""}${endMinutes}`;
+
+    return {
+        firstStart: firstShiftStartTimeText,
+        lastEnd: lastShiftEndTimeText
+    };
+}
+
+export interface State {
+    shiftList: ShiftList;
+    shiftListTimesUpdated: boolean;
+    shiftListReady: boolean;
+    header: {
+        title: string;
+        info: string;
+    };
+    fetchedState: boolean;
+}
+
 export default function App() {
     const emptyShiftList: ShiftList = {
         firstShiftStartTime: { hours: 0, minutes: 0 },
@@ -21,73 +50,135 @@ export default function App() {
         participants: []
     };
 
-    const [shiftList, setShiftList] = useState(emptyShiftList);
-    const [shiftListTimesUpdated, setShiftListTimesUpdated] = useState(false);
-    const [shiftListReady, setShiftListReady] = useState(false);
+    const [state, setState] = useState<State>({
+        shiftList: emptyShiftList,
+        shiftListTimesUpdated: false,
+        shiftListReady: false,
+        header: {
+            title: "Kipinävuorot",
+            info: ""
+        },
+        fetchedState: false
+    });
+
+    const updateState = (newState: State) => {
+        newState = {
+            ...state,
+            ...newState
+        };
+        AsyncStorage.setItem("state", JSON.stringify(newState));
+        setState(newState);
+    };
 
     useEffect(() => {
-        AsyncStorage.getItem("shiftlist").then((shiftListStringFromStorage) => {
-            if (!shiftListStringFromStorage) return;
-            setShiftList(JSON.parse(shiftListStringFromStorage));
+        AsyncStorage.getItem("state").then((stateStringFromStorage) => {
+            const stateFromStorage = stateStringFromStorage ? JSON.parse(stateStringFromStorage) : state;
+
+            updateState({
+                ...stateFromStorage,
+                fetchedState: true
+            });
         });
     }, []);
 
-    useEffect(() => {
-        AsyncStorage.setItem("shiftlist", JSON.stringify(shiftList));
-    });
-
     const updateShiftListTimes = (firstShiftStartTime: ShiftTime, lastShiftEndTime: ShiftTime) => {
-        setShiftListTimesUpdated(true);
+        const shiftListTimeTexts = shiftListTimesToString(
+            state.shiftList.firstShiftStartTime,
+            state.shiftList.lastShiftEndTime
+        );
+        const updatedShiftTimeTexts = shiftListTimesToString(firstShiftStartTime, lastShiftEndTime);
         if (
-            JSON.stringify(shiftList.firstShiftStartTime) === JSON.stringify(firstShiftStartTime) &&
-            JSON.stringify(shiftList.lastShiftEndTime) === JSON.stringify(lastShiftEndTime)
-        ) return;
-        setShiftList({
-            ...shiftList,
-            firstShiftStartTime,
-            lastShiftEndTime
+            shiftListTimeTexts.firstStart === updatedShiftTimeTexts.firstStart &&
+            shiftListTimeTexts.lastEnd === updatedShiftTimeTexts.lastEnd
+        ) return updateState({ ...state, shiftListTimesUpdated: true });
+
+        updateState({
+            ...state,
+            shiftList: {
+                ...state.shiftList,
+                firstShiftStartTime,
+                lastShiftEndTime
+            },
+            header: {
+                ...state.header,
+                info: `${updatedShiftTimeTexts.firstStart} - ${updatedShiftTimeTexts.lastEnd}`
+            },
+            shiftListTimesUpdated: true
         });
     };
 
     const updateShiftListParticipants = (shiftParticipants: ShiftParticipant[]) => {
-        setShiftList({ ...shiftList, participants: shiftParticipants });
+        updateState({
+            ...state,
+            shiftList: {
+                ...state.shiftList,
+                participants: shiftParticipants
+            }
+        });
     };
 
     const updateShiftList = () => {
-        setShiftList(generateShifts(shiftList));
+        updateState({
+            ...state,
+            shiftList: generateShifts(state.shiftList)
+        });
     };
 
-    return (
+    return !state.fetchedState ? null : (
         <View style={styles.background}>
             {
-                [shiftList, "\n"].forEach(v => console.log(v))
+                ["\n", state].forEach(v => console.log(v))
             }
-            <Text style={styles.heading}>Kipinävuorot</Text>
-            <ViewPager style={styles.viewPager}>
+            <View style={styles.header}>
+                <Text style={styles.headerTitle}>{state.header.title}</Text>
+                {
+                    state.header.info !== ""
+                        ? <Text style={styles.headerInfo}>{state.header.info}</Text>
+                        : null
+                }
+            </View>
+            <ViewPager
+                style={styles.viewPager}
+                headerInfo={state.header.info}
+                firstPageHeaderInfo={() => {
+                    const shiftListTimeTexts = shiftListTimesToString(
+                        state.shiftList.firstShiftStartTime,
+                        state.shiftList.lastShiftEndTime
+                    );
+                    return `${shiftListTimeTexts.firstStart} - ${shiftListTimeTexts.lastEnd}`;
+                }}
+                updateHeaderInfo={(text) => updateState({
+                    ...state,
+                    header: {
+                        ...state.header,
+                        info: text
+                    }
+                })}>
                 <View key="1">
                     {
-                        !shiftListReady
+                        !state.shiftListReady && !state.shiftListTimesUpdated
                             ? <UpdateShiftListTimes
-                                shiftList={shiftList}
+                                shiftList={state.shiftList}
                                 updateShiftListTimes={updateShiftListTimes}
+                                shiftListTimesToString={shiftListTimesToString}
                                 style={{ marginBottom: 15 }} />
                             : null
                     }
                     {
-                        !shiftListReady && shiftListTimesUpdated
+                        !state.shiftListReady && state.shiftListTimesUpdated
                             ? <AddShiftParticipant
-                                shiftList={shiftList}
+                                shiftList={state.shiftList}
                                 updateShiftListParticipants={updateShiftListParticipants}
-                                setShiftListReady={() => setShiftListReady(true)}
+                                setShiftListReady={() => updateState({ ...state, shiftListReady: true })}
                                 style={{ marginBottom: 15 }} />
                             : null
                     }
                     {
-                        shiftList && shiftList.participants.length > 0
-                            ? <FlatShiftList {...shiftList} /> : null
+                        state.shiftList.participants.length > 0
+                            ? <FlatShiftList {...state.shiftList} style={{ flex: 1 }} /> : null
                     }
                     {
-                        shiftListReady
+                        state.shiftListReady
                             ? <Button
                                 labelText="Luo kipinävuorot"
                                 onPress={updateShiftList} />
@@ -109,12 +200,20 @@ const styles = StyleSheet.create({
         padding: 15,
         backgroundColor: "#E8E8E8"
     },
-    heading: {
-        marginTop: 10,
+    header: {
+        marginTop: 5,
         marginLeft: 5,
-        marginBottom: 10,
+        marginBottom: 10
+    },
+    headerTitle: {
         fontSize: 25,
+        includeFontPadding: false,
         fontFamily: "Quicksand-Bold"
+    },
+    headerInfo: {
+        fontSize: 20,
+        includeFontPadding: false,
+        fontFamily: "Quicksand-Medium"
     },
     viewPager: {
         padding: 15,

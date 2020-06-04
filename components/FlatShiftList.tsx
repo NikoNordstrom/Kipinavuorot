@@ -1,6 +1,10 @@
 import React from "react";
-import { StyleSheet, FlatList, TouchableOpacity, Text, View, ScrollView } from "react-native";
+import { StyleSheet, FlatList, TouchableOpacity, Text, View, ViewStyle, ScrollView } from "react-native";
 import { ShiftTime, ShiftParticipant, ShiftList } from "../shift-generator";
+
+interface FlatShiftListProps extends ShiftList {
+    style?: ViewStyle;
+}
 
 function ShiftListItem(participant: ShiftParticipant) {
     const { name, shiftStartTime, shiftEndTime } = participant;
@@ -22,23 +26,26 @@ function ShiftListItem(participant: ShiftParticipant) {
     );
 }
 
-export default function FlatShiftList(props: ShiftList) {
-    const { participants } = props;
+export default function FlatShiftList(props: FlatShiftListProps) {
+    const { participants, style } = props;
 
     return (
-        <FlatList
-            data={participants}
-            renderItem={({ item: participant }) => {
-                return ShiftListItem(participant);
-            }}
-            keyExtractor={({ name }, index) => `${name}${index}`}
-            ListHeaderComponent={
-                <View style={styles.header}>
-                    <Text style={[styles.listItemTime, styles.headerItem]}>Alkaa</Text>
-                    <Text style={[styles.listItemTime, styles.headerItem]}>Päättyy</Text>
-                    <Text style={styles.headerItem}>Osallistuja</Text>
-                </View>
-            } />
+        <View style={style}>
+            <FlatList
+                data={participants}
+                renderItem={({ item: participant }) => {
+                    return ShiftListItem(participant);
+                }}
+                keyExtractor={({ name }, index) => `${name}${index}`}
+                ListHeaderComponent={
+                    <View style={styles.header}>
+                        <Text style={[styles.listItemTime, styles.headerItem]}>Alkaa</Text>
+                        <Text style={[styles.listItemTime, styles.headerItem]}>Päättyy</Text>
+                        <Text style={styles.headerItem}>Osallistuja</Text>
+                    </View>
+                } />
+        </View>
+        
     );
 }
 
