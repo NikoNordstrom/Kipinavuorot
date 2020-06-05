@@ -44,8 +44,7 @@ export default function AddShiftParticipant(props: AddShiftParticipantProps) {
                     onPress={() => setShiftListReady()}
                     style={{
                         flex: 0.5,
-                        marginRight: 15,
-                        opacity: doneButtonDisabled ? 0.6 : 1
+                        marginRight: 15
                     }} />
                 <Button
                     labelText="Lisää"

@@ -14,7 +14,7 @@ export default function Button(props: ButtonProps) {
         <TouchableHighlight
             disabled={disabled}
             touchSoundDisabled={disabled}
-            style={{ ...style, ...styles.highlight }}
+            style={{ ...style, ...styles.highlight, opacity: disabled ? 0.6 : 1 }}
             onPress={onPress}>
             <View style={styles.button}>
                 <Text style={styles.labelText}>{labelText}</Text>

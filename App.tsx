@@ -41,6 +41,7 @@ export interface State {
         info: string;
     };
     fetchedState: boolean;
+    headerInfoFullHeight: number;
 }
 
 export default function App() {
@@ -58,7 +59,8 @@ export default function App() {
             title: "Kipinävuorot",
             info: ""
         },
-        fetchedState: false
+        fetchedState: false,
+        headerInfoFullHeight: 0
     });
 
     const updateState = (newState: State) => {
@@ -133,11 +135,25 @@ export default function App() {
             }
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>{state.header.title}</Text>
-                <Text style={styles.headerInfo} ref={headerInfoRef}>{state.header.info}</Text>
+                {
+                    state.shiftListTimesUpdated 
+                        ? <Text
+                            style={styles.headerInfo}
+                            onLayout={({ nativeEvent }) => {
+                                if (state.shiftListTimesUpdated !== false && state.headerInfoFullHeight !== 0) return;
+                                updateState({
+                                    ...state,
+                                    headerInfoFullHeight: nativeEvent.layout.height
+                                });
+                            }}
+                            ref={headerInfoRef}>{state.header.info}</Text>
+                        : null
+                }
             </View>
             <ViewPager
                 style={styles.viewPager}
-                headerInfoRef={headerInfoRef}>
+                headerInfoRef={headerInfoRef}
+                headerInfoFullHeight={state.headerInfoFullHeight}>
                 <View key="1">
                     {
                         !state.shiftListReady && !state.shiftListTimesUpdated
@@ -164,7 +180,7 @@ export default function App() {
                     {
                         state.shiftListReady
                             ? <Button
-                                labelText="Luo kipinävuorot"
+                                labelText="Jaa vuorot"
                                 onPress={updateShiftList} />
                             : null
                     }
@@ -195,6 +211,7 @@ const styles = StyleSheet.create({
         fontFamily: "Quicksand-Bold"
     },
     headerInfo: {
+        height: 25,
         fontSize: 20,
         includeFontPadding: false,
         fontFamily: "Quicksand-Medium"

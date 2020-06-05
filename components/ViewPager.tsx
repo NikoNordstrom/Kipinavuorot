@@ -1,5 +1,5 @@
 import React, { ReactChildren, useState, useEffect } from "react";
-import { View, ViewStyle, Text, TextStyle, StyleSheet } from "react-native";
+import { View, ViewStyle, Text, StyleSheet } from "react-native";
 import BaseViewPager, {
     ViewPagerOnPageSelectedEventData,
     ViewPagerOnPageScrollEventData
@@ -8,6 +8,7 @@ import BaseViewPager, {
 interface ViewPagerProps {
     children: ReactChildren;
     headerInfoRef: React.RefObject<Text>;
+    headerInfoFullHeight: number;
     style?: ViewStyle;
 }
 
@@ -17,19 +18,17 @@ interface State {
         position: number;
         offset: number;
     };
-    headerInfoFullHeight: number;
 }
 
 export default function ViewPager(props: ViewPagerProps) {
-    const { children, headerInfoRef, style } = props;
+    const { children, headerInfoRef, headerInfoFullHeight, style } = props;
 
     const [state, setState] = useState<State>({
         page: 0,
         progress: {
             position: 0,
             offset: 0
-        },
-        headerInfoFullHeight: 0
+        }
     });
 
     const viewPager: React.Ref<BaseViewPager> = React.createRef();
@@ -59,15 +58,10 @@ export default function ViewPager(props: ViewPagerProps) {
     };
 
     useEffect(() => {
-        headerInfoRef.current?.measure((x, y, width, height) => {
-            setState({ ...state, headerInfoFullHeight: height });
-        });
-    }, []);
-
-    useEffect(() => {
+        if (headerInfoFullHeight === 0) return;
         headerInfoRef.current?.setNativeProps({
             style: {
-                height: (1 - state.progress.offset) * state.headerInfoFullHeight,
+                height: (1 - state.progress.offset) * headerInfoFullHeight,
                 opacity: 1 - state.progress.offset
             }
         });

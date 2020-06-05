@@ -1,45 +1,20 @@
 import React from "react";
-import { View, Text, TextInput as BaseTextInput, StyleSheet, ViewStyle } from "react-native";
+import { View, Text, TextInput as BaseTextInput, TextInputProps as BaseTextInputProps, StyleSheet, ViewStyle } from "react-native";
 
-export interface TextInputProps {
+export interface TextInputProps extends BaseTextInputProps {
     labelText: string;
-    value?: string;
-    placeholder?: string;
-    defaultValue?: string;
     style?: ViewStyle;
-    editable?: boolean;
-    maxLength?: number;
-    selectTextOnFocus?: boolean;
-    onChangeText?: (text: string) => void;
 }
 
 export default function TextInput(props: TextInputProps) {
-    const {
-        labelText,
-        value,
-        placeholder,
-        defaultValue,
-        style,
-        editable,
-        maxLength,
-        selectTextOnFocus,
-        onChangeText
-    } = props;
+    const { labelText, style } = props;
 
     return (
         <View style={[styles.container, style]}>
             <Text style={styles.label}>{labelText}</Text>
             <BaseTextInput
-                style={styles.baseTextInput}
-                value={value}
-                placeholder={placeholder}
-                defaultValue={defaultValue}
-                autoCorrect={false}
-                autoCompleteType="name"
-                editable={editable}
-                maxLength={maxLength}
-                selectTextOnFocus={selectTextOnFocus}
-                onChangeText={onChangeText} />
+                {...props}
+                style={styles.baseTextInput} />
         </View>
     );
 }

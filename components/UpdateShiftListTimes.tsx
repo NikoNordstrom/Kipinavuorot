@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, ViewStyle, Text, StyleSheet } from "react-native";
+import { View, ViewStyle, StyleSheet } from "react-native";
 import TextInput, { TextInputProps } from "./TextInput";
 import Button from "./Button";
 import { ShiftList, ShiftTime } from "../shift-generator";
@@ -45,6 +45,16 @@ export default function UpdateShiftListTimes(props: UpdateShiftListTimesProps) {
         updateShiftListTimes(firstShiftStartTime, lastShiftEndTime);
     }
 
+    const validShiftTimeTexts = (() => {
+        if (shiftTimeTexts.firstStart === defaultTimeText) return false;
+        if (shiftTimeTexts.lastEnd === defaultTimeText) return false;
+
+        if (shiftTimeTexts.firstStart.length !== 5) return false;
+        if (shiftTimeTexts.lastEnd.length !== 5) return false;
+
+        return true;
+    })();
+
     const textInputProps: TextInputProps = {
         labelText: "",
         placeholder: defaultTimeText,
@@ -71,6 +81,7 @@ export default function UpdateShiftListTimes(props: UpdateShiftListTimesProps) {
             </View>
             <Button
                 labelText="Valmis"
+                disabled={!validShiftTimeTexts}
                 onPress={() => setDone(true)}
                 style={{ marginTop: 15 }} />
         </View>
