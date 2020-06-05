@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 
@@ -124,6 +124,8 @@ export default function App() {
         });
     };
 
+    const headerInfoRef = useRef<Text>(null);
+
     return !state.fetchedState ? null : (
         <View style={styles.background}>
             {
@@ -131,29 +133,11 @@ export default function App() {
             }
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>{state.header.title}</Text>
-                {
-                    state.header.info !== ""
-                        ? <Text style={styles.headerInfo}>{state.header.info}</Text>
-                        : null
-                }
+                <Text style={styles.headerInfo} ref={headerInfoRef}>{state.header.info}</Text>
             </View>
             <ViewPager
                 style={styles.viewPager}
-                headerInfo={state.header.info}
-                firstPageHeaderInfo={() => {
-                    const shiftListTimeTexts = shiftListTimesToString(
-                        state.shiftList.firstShiftStartTime,
-                        state.shiftList.lastShiftEndTime
-                    );
-                    return `${shiftListTimeTexts.firstStart} - ${shiftListTimeTexts.lastEnd}`;
-                }}
-                updateHeaderInfo={(text) => updateState({
-                    ...state,
-                    header: {
-                        ...state.header,
-                        info: text
-                    }
-                })}>
+                headerInfoRef={headerInfoRef}>
                 <View key="1">
                     {
                         !state.shiftListReady && !state.shiftListTimesUpdated

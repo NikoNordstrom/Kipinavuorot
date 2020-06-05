@@ -23,15 +23,17 @@ export default function Button(props: ButtonProps) {
     );
 }
 
+const height = 40;
+
 const styles = StyleSheet.create({
     highlight: {
-        borderRadius: 45 / 2
+        borderRadius: height / 2
     },
     button: {
-        height: 45,
+        height,
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: 45 / 2,
+        borderRadius: height / 2,
         backgroundColor: "mediumseagreen"
     },
     labelText: {

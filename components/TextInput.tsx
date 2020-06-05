@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
         fontFamily: "Quicksand-Medium"
     },
     baseTextInput: {
+        height: 45,
         padding: 10,
         borderWidth: 1,
         borderRadius: 10,

@@ -1,5 +1,5 @@
 import React, { ReactChildren, useState, useEffect } from "react";
-import { View, ViewStyle, Text, StyleSheet } from "react-native";
+import { View, ViewStyle, Text, TextStyle, StyleSheet } from "react-native";
 import BaseViewPager, {
     ViewPagerOnPageSelectedEventData,
     ViewPagerOnPageScrollEventData
@@ -7,9 +7,7 @@ import BaseViewPager, {
 
 interface ViewPagerProps {
     children: ReactChildren;
-    headerInfo: string;
-    firstPageHeaderInfo: () => string;
-    updateHeaderInfo: (text: string) => void;
+    headerInfoRef: React.RefObject<Text>;
     style?: ViewStyle;
 }
 
@@ -19,17 +17,19 @@ interface State {
         position: number;
         offset: number;
     };
+    headerInfoFullHeight: number;
 }
 
 export default function ViewPager(props: ViewPagerProps) {
-    const { children, headerInfo, firstPageHeaderInfo, updateHeaderInfo, style } = props;
+    const { children, headerInfoRef, style } = props;
 
     const [state, setState] = useState<State>({
         page: 0,
         progress: {
             position: 0,
             offset: 0
-        }
+        },
+        headerInfoFullHeight: 0
     });
 
     const viewPager: React.Ref<BaseViewPager> = React.createRef();
@@ -43,11 +43,13 @@ export default function ViewPager(props: ViewPagerProps) {
     };
 
     const onPageScroll = (e: ViewPagerOnPageScrollEventData) => {
+        const offset = e.offset === 0 ? e.position : e.offset;
         setState({
             ...state,
+            page: offset < 0.5 ? 0 : 1,
             progress: {
                 position: e.position,
-                offset: e.offset
+                offset
             }
         });
     };
@@ -56,12 +58,19 @@ export default function ViewPager(props: ViewPagerProps) {
         viewPager.current?.setPage(page);
     };
 
-    const underlineOffset = state.progress.offset === 0 ? state.page : state.progress.offset;
+    useEffect(() => {
+        headerInfoRef.current?.measure((x, y, width, height) => {
+            setState({ ...state, headerInfoFullHeight: height });
+        });
+    }, []);
 
     useEffect(() => {
-        const newHeaderInfo = state.page === 0 ? firstPageHeaderInfo() : "";
-        if (newHeaderInfo === headerInfo) return;
-        if (newHeaderInfo !== "00:00 - 00:00") updateHeaderInfo(newHeaderInfo);
+        headerInfoRef.current?.setNativeProps({
+            style: {
+                height: (1 - state.progress.offset) * state.headerInfoFullHeight,
+                opacity: 1 - state.progress.offset
+            }
+        });
     });
 
     return (
@@ -74,7 +83,7 @@ export default function ViewPager(props: ViewPagerProps) {
                     style={[styles.tabHeader, state.page === 1 ? { fontFamily: "Quicksand-Bold" } : null]}
                     onPress={() => goToPage(1)}>Aiemmat</Text>
             </View>
-            <View style={[styles.tabsUnderline, { left: `${underlineOffset * 50}%` }]} />
+            <View style={[styles.tabsUnderline, { left: `${state.progress.offset * 50}%` }]} />
             <BaseViewPager
                 style={styles.viewPager}
                 ref={viewPager}
@@ -91,11 +100,11 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     },
     tabHeader: {
-        paddingTop: 15,
-        paddingBottom: 15,
+        paddingTop: 12.5,
+        paddingBottom: 12.5,
         flex: 0.5,
         textAlign: "center",
-        fontSize: 15,
+        fontSize: 17.5,
         fontFamily: "Quicksand-Medium"
     },
     tabsUnderline: {
