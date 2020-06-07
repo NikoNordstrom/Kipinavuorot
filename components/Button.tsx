@@ -4,19 +4,20 @@ import { TouchableHighlight, ViewStyle, View, Text, StyleSheet } from "react-nat
 interface ButtonProps {
     labelText: string;
     disabled?: boolean;
+    color?: "green" | "red";
     style?: ViewStyle;
     onPress?: () => void;
 }
 
 export default function Button(props: ButtonProps) {
-    const { labelText, disabled, style, onPress } = props;
+    const { labelText, disabled, color, style, onPress } = props;
     return (
         <TouchableHighlight
             disabled={disabled}
             touchSoundDisabled={disabled}
             style={{ ...style, ...styles.highlight, opacity: disabled ? 0.6 : 1 }}
             onPress={onPress}>
-            <View style={styles.button}>
+            <View style={[{ backgroundColor: color === "red" ? "#e63946" : "mediumseagreen" }, styles.button]}>
                 <Text style={styles.labelText}>{labelText}</Text>
             </View>
         </TouchableHighlight>
@@ -33,8 +34,7 @@ const styles = StyleSheet.create({
         height,
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: height / 2,
-        backgroundColor: "mediumseagreen"
+        borderRadius: height / 2
     },
     labelText: {
         includeFontPadding: false,

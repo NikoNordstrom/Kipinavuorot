@@ -167,6 +167,24 @@ function whoGetsThisShift(theShiftStartTime: ShiftTime, participantNames: string
 }
 
 function roundShiftMinutesToFive(shiftParticipants: ShiftParticipant[]): ShiftParticipant[] {
+    let allExtraMinutes = 0;
+
+    shiftParticipants.forEach((participant) => {
+        allExtraMinutes += participant.shiftEndTime.minutes % 5;
+    });
+
+    for (let i = 0; i < 2; i++) {
+        if (allExtraMinutes / 5 >= 1) {
+            shiftParticipants[0].shiftEndTime.minutes -= shiftParticipants[0].shiftEndTime.minutes % 5;
+            shiftParticipants[0].shiftEndTime.minutes += 5;
+            if (shiftParticipants[0].shiftEndTime.minutes === 60) {
+                shiftParticipants[0].shiftEndTime.hours++;
+                shiftParticipants[0].shiftEndTime.minutes = 0;
+            }
+            allExtraMinutes -= 5;
+        }
+    }
+
     shiftParticipants.forEach((participant, index) => {
         if (index > 0) {
             const shiftStartTime = { ...shiftParticipants[index - 1].shiftEndTime };

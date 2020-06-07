@@ -7,13 +7,22 @@ import { ShiftTimeTexts } from "../App";
 
 interface UpdateShiftListTimesProps {
     shiftList: ShiftList;
+    firstStartDefaultText?: string;
+    lastEndDefaultText?: string;
     updateShiftListTimes: (firstShiftStartTime: ShiftTime, lastShiftEndTime: ShiftTime) => void;
     shiftListTimesToString: (firstShiftStartTime: ShiftTime, lastShiftEndTime: ShiftTime) => ShiftTimeTexts;
     style?: ViewStyle;
 }
 
 export default function UpdateShiftListTimes(props: UpdateShiftListTimesProps) {
-    const { shiftList, updateShiftListTimes, shiftListTimesToString, style } = props;
+    const {
+        shiftList,
+        firstStartDefaultText,
+        lastEndDefaultText,
+        updateShiftListTimes,
+        shiftListTimesToString,
+        style
+    } = props;
     const defaultTimeText = "00:00";
 
     const shiftListTimeTexts = shiftListTimesToString(shiftList.firstShiftStartTime, shiftList.lastShiftEndTime);
@@ -45,6 +54,11 @@ export default function UpdateShiftListTimes(props: UpdateShiftListTimesProps) {
         updateShiftListTimes(firstShiftStartTime, lastShiftEndTime);
     }
 
+    if (firstStartDefaultText && lastEndDefaultText) {
+        shiftTimeTexts.firstStart = firstStartDefaultText;
+        shiftTimeTexts.lastEnd = lastEndDefaultText;
+    }
+
     const validShiftTimeTexts = (() => {
         if (shiftTimeTexts.firstStart === defaultTimeText) return false;
         if (shiftTimeTexts.lastEnd === defaultTimeText) return false;
@@ -69,13 +83,13 @@ export default function UpdateShiftListTimes(props: UpdateShiftListTimesProps) {
                 <TextInput
                     { ...textInputProps }
                     labelText="Alkaa"
-                    defaultValue={shiftTimeTexts.firstStart}
+                    defaultValue={firstStartDefaultText || shiftTimeTexts.firstStart}
                     style={{ ...styles.textInput, marginRight: 15 }}
                     onChangeText={(text) => setShiftTimeTexts({ ...shiftTimeTexts, firstStart: text })} />
                 <TextInput
                     { ...textInputProps }
                     labelText="Päättyy"
-                    defaultValue={shiftTimeTexts.lastEnd}
+                    defaultValue={lastEndDefaultText || shiftTimeTexts.lastEnd}
                     style={styles.textInput}
                     onChangeText={(text) => setShiftTimeTexts({ ...shiftTimeTexts, lastEnd: text })} />
             </View>
