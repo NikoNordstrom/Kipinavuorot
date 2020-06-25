@@ -9,16 +9,18 @@ interface Props {
     text?: string;
     onYes: () => void;
     onNo: () => void;
+    onRequestClose: () => void;
 }
 
 export default function YesNoModal(props: Props) {
-    const { visible, title, text, onYes, onNo } = props;
+    const { visible, title, text, onYes, onNo, onRequestClose } = props;
 
     return (
         <Modal
             animationType="slide"
             transparent={true}
-            visible={visible}>
+            visible={visible}
+            onRequestClose={onRequestClose}>
             <View style={styles.centeredView}>
                 <View style={styles.modalView}>
                     <Text style={styles.modalTitle}>{title}</Text>

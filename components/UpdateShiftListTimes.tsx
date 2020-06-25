@@ -54,9 +54,10 @@ export default function UpdateShiftListTimes(props: UpdateShiftListTimesProps) {
         updateShiftListTimes(firstShiftStartTime, lastShiftEndTime);
     }
 
-    if (firstStartDefaultText && lastEndDefaultText) {
+    if (firstStartDefaultText && lastEndDefaultText && !shiftTimeTexts.initialValuesUpdated) {
         shiftTimeTexts.firstStart = firstStartDefaultText;
         shiftTimeTexts.lastEnd = lastEndDefaultText;
+        setShiftTimeTexts({ ...shiftTimeTexts, initialValuesUpdated: true });
     }
 
     const validShiftTimeTexts = (() => {

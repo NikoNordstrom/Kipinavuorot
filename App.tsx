@@ -86,6 +86,7 @@ export default function App() {
             ...newState
         };
         AsyncStorage.setItem("state", JSON.stringify(newState));
+        ["\n", JSON.stringify(newState)].forEach(v => console.log(v));
         setState(newState);
     };
 
@@ -209,9 +210,6 @@ export default function App() {
 
     return !state.fetchedState ? null : (
         <View style={styles.background}>
-            {
-                ["\n", state.shiftListHistory.map(({ shiftLists }) => shiftLists)].forEach(v => console.log(v))
-            }
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>{state.header.title}</Text>
                 {
@@ -235,13 +233,14 @@ export default function App() {
                 title="Uusi lista"
                 text="Tuleeko uuteen listaan samat osallistujat?"
                 onYes={() => createNewShiftList(true)}
-                onNo={() => createNewShiftList(false)} />
+                onNo={() => createNewShiftList(false)}
+                onRequestClose={() => updateState({ ...state, newShiftListModalVisible: false })} />
 
             <ViewPager
                 style={styles.viewPager}
                 headerInfoRef={headerInfoRef}
                 headerInfoFullHeight={state.headerInfoFullHeight}>
-                <View key="1">
+                <View key="Nykyinen">
                     {
                         !state.shiftListReady && !state.shiftListTimesUpdated
                             ? <UpdateShiftListTimes
@@ -283,7 +282,7 @@ export default function App() {
                             : null
                     }
                 </View>
-                <View key="2" style={{ flex: 1 }}>
+                <View key="Aiemmat" style={{ flex: 1 }}>
                     <Text style={styles.noPreviousShiftListsFound}>Aiempia kipinävuoroja ei löytynyt.</Text>
                 </View>
             </ViewPager>
