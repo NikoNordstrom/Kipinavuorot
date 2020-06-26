@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, BackHandler } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 
 import generateShifts, {
@@ -100,6 +100,30 @@ export default function App() {
             });
         });
     }, []);
+
+    useEffect(() => {
+        const backHandler = BackHandler.addEventListener("hardwareBackPress", () => {
+            if (state.shiftListReady) {
+                updateState({ ...state, shiftListReady: false });
+                return true;
+            }
+            else if (state.shiftListTimesUpdated) {
+                updateState({
+                    ...state,
+                    shiftListTimesUpdated: false,
+                    shiftList: {
+                        firstShiftStartTime: emptyShiftList.firstShiftStartTime,
+                        lastShiftEndTime: emptyShiftList.lastShiftEndTime,
+                        participants: state.shiftList.participants
+                    }
+                });
+                return true;
+            }
+            return false;
+        });
+
+        return () => backHandler.remove();
+    });
 
     const updateShiftListTimes = (firstShiftStartTime: ShiftTime, lastShiftEndTime: ShiftTime) => {
         const shiftListTimeTexts = shiftListTimesToString(
