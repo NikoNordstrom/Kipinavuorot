@@ -14,13 +14,14 @@ import UpdateShiftListTimes from "./components/UpdateShiftListTimes";
 import AddShiftParticipant from "./components/AddShiftParticipant";
 import Button from "./components/Button";
 import YesNoModal from "./components/YesNoModal";
+import PreviousShiftLists from "./components/PreviousShiftLists";
 
 export interface ShiftTimeTexts {
     firstStart: string;
     lastEnd: string;
 }
 
-interface ShiftListHistory {
+export interface ShiftListHistory {
     currentlySelected: boolean;
     title: string;
     shiftLists: ShiftList[];
@@ -59,6 +60,12 @@ export default function App() {
         firstShiftStartTime: { hours: 0, minutes: 0 },
         lastShiftEndTime: { hours: 0, minutes: 0 },
         participants: []
+    };
+
+    const dateFormat = (timestampMilliseconds: number) => {
+        const date = new Date(timestampMilliseconds);
+
+        return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
     };
 
     const [state, setState] = useState<State>({
@@ -188,16 +195,22 @@ export default function App() {
             });
         }
 
+        const nowWithOffset = Date.now() - new Date().getTimezoneOffset() * 60 * 1000;
+
         if (selectedShiftListHistoryIndex > -1) {
             newShiftListHistory[selectedShiftListHistoryIndex].shiftLists.unshift(state.shiftList);
+
+            if (newShiftListHistory[selectedShiftListHistoryIndex].title === "") {
+                newShiftListHistory[selectedShiftListHistoryIndex].title = dateFormat(nowWithOffset);
+            }
         }
 
         if (selectedShiftListHistoryIndex === -1 || !usePreviousShiftList) {
-            const shiftListDate = new Date(Date.parse(state.shiftList.shiftsGeneratedTimestamp || Date.now().toString()));
+            const shiftListDateString = dateFormat(Number.parseInt(state.shiftList.shiftsGeneratedTimestamp || nowWithOffset.toString()));
 
             newShiftListHistory.unshift({
                 currentlySelected: true,
-                title: shiftListDate.toDateString(),
+                title: `${shiftListDateString} - ${dateFormat(nowWithOffset)}`,
                 shiftLists: [state.shiftList]
             });
         }
@@ -307,7 +320,11 @@ export default function App() {
                     }
                 </View>
                 <View key="Aiemmat" style={{ flex: 1 }}>
-                    <Text style={styles.noPreviousShiftListsFound}>Aiempia kipinävuoroja ei löytynyt.</Text>
+                    {
+                        state.shiftListHistory.length > 0 && state.shiftListHistory[0].shiftLists.length > 0
+                            ? <PreviousShiftLists shiftListHistory={state.shiftListHistory} />
+                            : <Text style={styles.noPreviousShiftListsFound}>Aiempia kipinävuoroja ei löytynyt.</Text>
+                    }
                 </View>
             </ViewPager>
         </View>

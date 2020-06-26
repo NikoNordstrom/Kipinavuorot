@@ -202,7 +202,7 @@ export default function generateShifts(shiftList: ShiftList, shiftListHistory?: 
     const newShiftList: ShiftList = {
         ...shiftList,
         participants: generateEmptyShifts(shiftList),
-        shiftsGeneratedTimestamp: new Date().toLocaleString("fi-FI")
+        shiftsGeneratedTimestamp: (Date.now() - new Date().getTimezoneOffset() * 60 * 1000).toString()
     };
 
     if (randomShifts || !shiftListHistory || shiftListHistory.length < 1) {
