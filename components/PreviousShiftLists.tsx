@@ -18,6 +18,7 @@ function ShiftListHistoryItem(props: ShiftListHistoryItemProps) {
     return (
         <View style={styles.shiftListHistoryItem}>
             <Text>{shiftList.shiftsGeneratedTimestamp}</Text>
+            <Text>{shiftList.participants.length} osallistujaa</Text>
         </View>
     );
 }
@@ -54,6 +55,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
     shiftListHistoryItem: {
-        width: "100%"
+        width: "100%",
+        padding: 15
     }
 });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { StyleSheet, View, Text, BackHandler } from "react-native";
+import { StyleSheet, View, Text, BackHandler, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 
 import generateShifts, {
@@ -93,7 +93,12 @@ export default function App() {
             ...newState
         };
         AsyncStorage.setItem("state", JSON.stringify(newState));
-        ["\n", JSON.stringify(newState)].forEach(v => console.log(v));
+        [
+            "\n",
+            JSON.stringify({ ...newState, shiftList: undefined, shiftListHistory: undefined }),
+            JSON.stringify({ shiftList: newState.shiftList }),
+            JSON.stringify({ shiftListHistory: newState.shiftListHistory })
+        ].forEach(v => console.log(v));
         setState(newState);
     };
 
@@ -229,7 +234,7 @@ export default function App() {
                     shiftEndTime: emptyShiftTime
                 }))
                 : [],
-            shiftsGeneratedTimestamp: undefined
+            timestamp: undefined
         };
 
         updateState({

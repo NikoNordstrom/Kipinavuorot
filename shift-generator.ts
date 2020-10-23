@@ -1,3 +1,5 @@
+// import { ShiftListHistory } from "App";
+
 export interface ShiftTime {
     hours: number;
     minutes: number;
@@ -7,19 +9,14 @@ export interface ShiftParticipant {
     name: string;
     shiftStartTime: ShiftTime;
     shiftEndTime: ShiftTime;
-    goodShiftRatioBonus?: true;
 }
 
 export interface ShiftList {
     firstShiftStartTime: ShiftTime;
     lastShiftEndTime: ShiftTime;
     participants: ShiftParticipant[];
-    shiftsGeneratedTimestamp?: string;
-}
-
-interface ShiftCandidate {
-    name: string;
-    shiftChancePercent: number;
+    shiftedNumber?: number;
+    timestamp?: string;
 }
 
 function generateEmptyShifts(shiftList: ShiftList): ShiftParticipant[] {
@@ -57,8 +54,10 @@ function generateEmptyShifts(shiftList: ShiftList): ShiftParticipant[] {
 
 function generateRandomShifts(shiftList: ShiftList): ShiftParticipant[] {
     const participantsNames = shiftList.participants.map(({ name }) => name);
+
     let emptyShiftList = generateEmptyShifts(shiftList);
     emptyShiftList = roundShiftMinutesToFive(emptyShiftList);
+
     // Add all of the participants names to randomly selected participants with shifts.
     return emptyShiftList.map(shiftParticipant => {
         const participantNameIndex = Math.floor(Math.random() * participantsNames.length);
@@ -68,102 +67,14 @@ function generateRandomShifts(shiftList: ShiftList): ShiftParticipant[] {
     });
 }
 
-function whoGetsGoodShifts(shiftList: ShiftList, shiftListHistory: ShiftList[]): string[] {
-    const possibleCandidates: ShiftCandidate[] = [];
+function shiftParticipantsNames(participantsNames: string[], numberOfShifts: number): string[] {
+    const newParticipantsNames = [...participantsNames];
 
-    // Calculate shiftChancePercent for every participant and populate possibleCandidates.
-    shiftList.participants.forEach(participant => {
-        let totalNumberOfPreviousShifts = 0;
-        let previousGoodShiftsCount = 0;
-        shiftListHistory.forEach(({ participants }) => {
-            totalNumberOfPreviousShifts += participants.filter(({ name }) => name === participant.name).length;
-            if (participants[0].name === participant.name) previousGoodShiftsCount++;
-            else if (participants[participants.length - 1].name === participant.name) previousGoodShiftsCount++;
-        });
-        if (participant.goodShiftRatioBonus) {
-            previousGoodShiftsCount--;
-            delete participant.goodShiftRatioBonus;
-        }
-        previousGoodShiftsCount += shiftListHistory.length - totalNumberOfPreviousShifts;
-        possibleCandidates.push({
-            name: participant.name,
-            shiftChancePercent: (previousGoodShiftsCount + 1) / (totalNumberOfPreviousShifts + 1)
-        });
-    });
-
-    // Sort possibleCandidates in ascending order.
-    possibleCandidates.sort(({ shiftChancePercent: a }, { shiftChancePercent: b }) => {
-        if (a < b) return -1;
-        if (a > b) return 1;
-        return 0;
-    });
-
-    // Remove unnecessary candidates from possibleCandidates.
-    possibleCandidates.forEach(({ shiftChancePercent }, candidateIndex) => {
-        if (shiftChancePercent > possibleCandidates[1].shiftChancePercent) {
-            possibleCandidates.splice(candidateIndex);
-        }
-    });
-
-    // Select good shift candidates and return their names in an array.
-    if (possibleCandidates.length > 2) {
-        const firstAndLastShiftParticipantsNames: string[] = [];
-        if (possibleCandidates[0].shiftChancePercent < possibleCandidates[1].shiftChancePercent) {
-            firstAndLastShiftParticipantsNames.push(possibleCandidates[0].name);
-            possibleCandidates.shift();
-            const selectedCandidateName = possibleCandidates[Math.floor(Math.random() * possibleCandidates.length)].name;
-            firstAndLastShiftParticipantsNames.push(selectedCandidateName);
-        }
-        else {
-            const firstSelectedCandidateIndex = Math.floor(Math.random() * possibleCandidates.length);
-            firstAndLastShiftParticipantsNames.push(possibleCandidates[firstSelectedCandidateIndex].name);
-            possibleCandidates.splice(firstSelectedCandidateIndex, 1);
-            const secondSelectedCandidateIndex = Math.floor(Math.random() * possibleCandidates.length);
-            firstAndLastShiftParticipantsNames.push(possibleCandidates[secondSelectedCandidateIndex].name);
-        }
-        return firstAndLastShiftParticipantsNames;
+    for (let i = 0; i < numberOfShifts; i++) {
+        newParticipantsNames.unshift(newParticipantsNames.splice(newParticipantsNames.length - 1, 1)[0]);
     }
-    const firstShiftParticipantIndex = Math.floor(Math.random() * 2);
-    return [
-        possibleCandidates[firstShiftParticipantIndex].name,
-        possibleCandidates[Math.abs(firstShiftParticipantIndex - 1)].name
-    ];
-}
 
-function whoGetsThisShift(theShiftStartTime: ShiftTime, participantNames: string[], shiftListHistory: ShiftList[]): string {
-    const possibleCandidates: ShiftCandidate[] = [];
-
-    participantNames.forEach(participantName => {
-        let totalNumberOfPreviousShifts = 0;
-        let totalNumberOfTheShiftOccurrences = 0;
-
-        shiftListHistory.forEach(({ participants }) => {
-            participants.forEach(({ name, shiftStartTime }) => {
-                if (name !== participantName) return;
-                totalNumberOfPreviousShifts++;
-                const { hours, minutes } = shiftStartTime;
-                if (hours === theShiftStartTime.hours && minutes === theShiftStartTime.minutes) totalNumberOfTheShiftOccurrences++;
-            });
-        });
-
-        possibleCandidates.push({
-            name: participantName,
-            shiftChancePercent: (totalNumberOfTheShiftOccurrences + 1) / (totalNumberOfPreviousShifts + 1)
-        });
-    });
-
-    possibleCandidates.sort(({ shiftChancePercent: a }, { shiftChancePercent: b }) => {
-        if (a < b) return -1;
-        if (a > b) return 1;
-        return 0;
-    });
-
-    possibleCandidates.forEach(({ shiftChancePercent }, index) => {
-        if (shiftChancePercent > possibleCandidates[0].shiftChancePercent) possibleCandidates.splice(index);
-    });
-
-    if (possibleCandidates.length === 1) return possibleCandidates[0].name;
-    return possibleCandidates[Math.floor(Math.random() * possibleCandidates.length)].name;
+    return newParticipantsNames;
 }
 
 function roundShiftMinutesToFive(shiftParticipants: ShiftParticipant[]): ShiftParticipant[] {
@@ -202,39 +113,84 @@ export default function generateShifts(shiftList: ShiftList, shiftListHistory?: 
     const newShiftList: ShiftList = {
         ...shiftList,
         participants: generateEmptyShifts(shiftList),
-        shiftsGeneratedTimestamp: (Date.now() - new Date().getTimezoneOffset() * 60 * 1000).toString()
+        timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60 * 1000).toISOString()
     };
 
     if (randomShifts || !shiftListHistory || shiftListHistory.length < 1) {
         newShiftList.participants = generateRandomShifts(shiftList);
+        newShiftList.shiftedNumber = 0;
         return newShiftList;
     }
 
-    const goodShiftParticipantsNames = whoGetsGoodShifts(shiftList, shiftListHistory);
-    newShiftList.participants[0].name = goodShiftParticipantsNames[0];
-    newShiftList.participants[newShiftList.participants.length - 1].name = goodShiftParticipantsNames[1];
+    const previouslyShifted: { shiftedNumber: number; count: number }[] = [];
 
-    const remainingShifts = newShiftList.participants.filter(({ name }) => {
-        if (goodShiftParticipantsNames.includes(name)) return false;
-        return true;
+    // Count and add all previously shifted numbers to previouslyShifted array
+    // except the ones that are larger than the current shiftList.participants.length.
+    for (let i = 1; i < shiftListHistory.length; i++) {
+        const previouslyShiftedIndex = previouslyShifted.findIndex(({ shiftedNumber }) => shiftedNumber === shiftListHistory[i].shiftedNumber);
+
+        if (previouslyShiftedIndex > -1) previouslyShifted[previouslyShiftedIndex].count++;
+        else if ((shiftListHistory[i].shiftedNumber || shiftList.participants.length) < shiftList.participants.length) {
+            if (shiftListHistory[i].shiftedNumber === 0 || !shiftListHistory[i].shiftedNumber) continue;
+            previouslyShifted.push({ shiftedNumber: shiftListHistory[i].shiftedNumber || 0, count: 1 });
+        }
+    }
+
+    // Add all possible shift numbers that are not already in the previouslyShifted array.
+    for (let i = 1; i < shiftList.participants.length; i++) {
+        if (previouslyShifted.find(({ shiftedNumber }) => shiftedNumber === i)) continue;
+        previouslyShifted.push({ shiftedNumber: i, count: 0 });
+    }
+
+    // Sort by ascending order.
+    previouslyShifted.sort(({ count: a }, { count: b }) => {
+        if (a < b) return -1;
+        if (a > b) return 1;
+        return 0;
     });
 
-    const remainingParticipantNames = shiftList.participants
-        .filter(({ name }) => !goodShiftParticipantsNames.includes(name))
-        .map(({ name }) => name);
+    // Leave all elements with the same count as the first element and delete the rest.
+    // The first element is the most suitable number of shifts (there can be multiple elements).
+    for (let i = 1; i < previouslyShifted.length; i++) {
+        if (previouslyShifted[i].count > previouslyShifted[i - 1].count) previouslyShifted.splice(i);
+    }
 
-    remainingShifts.forEach(({ shiftStartTime }) => {
-        const thisShiftParticipantName = whoGetsThisShift(shiftStartTime, remainingParticipantNames, shiftListHistory);
-        remainingParticipantNames.splice(remainingParticipantNames.findIndex(name => name === thisShiftParticipantName), 1);
-        const newShiftIndex = newShiftList.participants.findIndex((participant) => {
-            const { hours, minutes } = participant.shiftStartTime;
-            if (hours === shiftStartTime.hours && minutes === shiftStartTime.minutes) return true;
-            return false;
-        });
-        newShiftList.participants[newShiftIndex].name = thisShiftParticipantName;
-    });
+    // If all possible shifts are made then remove the last shifted number from the previouslyShifted array.
+    if (previouslyShifted.length === shiftList.participants.length - 1) {
+        const previouslyShiftedNumber = shiftListHistory[shiftListHistory.length - 1].shiftedNumber;
+        const previouslyShiftedDeleteIndex = previouslyShifted.findIndex(({ shiftedNumber }) => shiftedNumber === previouslyShiftedNumber);
+        if (previouslyShiftedDeleteIndex > 0) previouslyShifted.splice(previouslyShiftedDeleteIndex, 1);
+    }
 
-    newShiftList.participants = roundShiftMinutesToFive(newShiftList.participants);
+    let mostSuitableNumberOfShifts = Math.floor(Math.random() * (shiftList.participants.length - 1)) + 1;
+
+    if (previouslyShifted.length > 0) {
+        const randomlySelectedIndex = Math.floor(Math.random() * previouslyShifted.length);
+        mostSuitableNumberOfShifts = previouslyShifted[randomlySelectedIndex].shiftedNumber;
+    }
+
+    // Find the last shiftList where its shiftedNumber is equal to 0.
+    const baseShiftList = [...shiftListHistory].reverse().find(({ shiftedNumber }) => shiftedNumber === 0);
+
+    let baseParticipantsNames = baseShiftList
+        ? baseShiftList.participants.map(({ name }) => name)
+        : shiftListHistory[0].participants.map(({ name }) => name);
+
+    const shiftListParticipantsNamesChanged = shiftList.participants.some(({ name }) => !baseParticipantsNames.includes(name));
+
+    // If shiftList.participants names or length is changed then use participants names from shiftList.participants.
+    if (shiftList.participants.length !== baseParticipantsNames.length || shiftListParticipantsNamesChanged) {
+        baseParticipantsNames = shiftList.participants.map(({ name }) => name);
+    }
+
+    const shiftedParticipantsNames = shiftParticipantsNames(baseParticipantsNames, mostSuitableNumberOfShifts);
+    
+    // Assign the most suitable participants (first element in the shiftChanceArray rows) to the new shift list shifts.
+    for (let shiftIndex = 0; shiftIndex < newShiftList.participants.length; shiftIndex++) {
+        newShiftList.participants[shiftIndex].name = shiftedParticipantsNames[shiftIndex];
+    }
+
+    newShiftList.shiftedNumber = mostSuitableNumberOfShifts;
 
     return newShiftList;
 }

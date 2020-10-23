@@ -71,10 +71,10 @@ export default function ViewPager(props: ViewPagerProps) {
         <View style={style}>
             <View style={styles.tabsHeaderContainer}>
                 <Text
-                    style={[styles.tabHeader, state.page === 0 ? { fontFamily: "Quicksand-Bold" } : null]}
+                    style={[styles.tabHeader, state.progress.offset < 0.5 ? { fontFamily: "Quicksand-Bold" } : null]}
                     onPress={() => goToPage(0)}>Nykyinen</Text>
                 <Text
-                    style={[styles.tabHeader, state.page === 1 ? { fontFamily: "Quicksand-Bold" } : null]}
+                    style={[styles.tabHeader, state.progress.offset >= 0.5 ? { fontFamily: "Quicksand-Bold" } : null]}
                     onPress={() => goToPage(1)}>Aiemmat</Text>
             </View>
             <View style={[styles.tabsUnderline, { left: `${state.progress.offset * 50}%` }]} />
