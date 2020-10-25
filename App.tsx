@@ -6,7 +6,7 @@ import generateShifts, {
     ShiftList,
     ShiftTime,
     ShiftParticipant
-} from "./shift-generator";
+} from "./src/shift-generator";
 
 import ViewPager from "./components/ViewPager";
 import FlatShiftList from "./components/FlatShiftList";

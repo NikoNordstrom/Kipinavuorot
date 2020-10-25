@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, SectionList, View, Text } from "react-native";
 
-import { ShiftList } from "../shift-generator";
+import { ShiftList } from "../src/shift-generator";
 import { ShiftListHistory } from "../App";
 
 interface PreviousShiftListsProps {

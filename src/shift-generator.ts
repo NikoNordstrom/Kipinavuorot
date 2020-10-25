@@ -1,5 +1,3 @@
-// import { ShiftListHistory } from "App";
-
 export interface ShiftTime {
     hours: number;
     minutes: number;
