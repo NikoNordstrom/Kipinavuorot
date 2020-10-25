@@ -11,6 +11,7 @@ const _baseShiftList: ShiftList = {
         shiftEndTime: { hours: 0, minutes: 0 }
     }))
 };
+
 const baseShiftListString = JSON.stringify(_baseShiftList);
 
 function generateShiftListHistory(listCount: number): ShiftList[] {
@@ -18,8 +19,13 @@ function generateShiftListHistory(listCount: number): ShiftList[] {
     const newShiftListHistory: ShiftList[] = [];
 
     for (let i = 0; i < listCount; i++) {
+        if (i === 2) newShiftList.participants.splice(0, 1);
+        if (i === 6) newShiftList.participants.push(
+            { name: "f", shiftStartTime: { hours: 0, minutes: 0 }, shiftEndTime: { hours: 0, minutes: 0 } }
+        );
+        if (i === 11) newShiftList.participants[0].name = "g";
         newShiftList = generateShifts(newShiftList, newShiftListHistory);
-        newShiftListHistory.push(newShiftList);
+        newShiftListHistory.push(JSON.parse(JSON.stringify(newShiftList)));
     }
 
     return newShiftListHistory;
@@ -43,8 +49,9 @@ describe("generated shiftlist is valid when it", () => {
 });
 
 test("shift participants not repeating", () => {
-    const shiftList: ShiftList = JSON.parse(baseShiftListString);
-    const shiftListHistory = generateShiftListHistory(shiftList.participants.length);
+    // const shiftList: ShiftList = JSON.parse(baseShiftListString);
+    const shiftListHistory = generateShiftListHistory(14);
+    console.log(shiftListHistory.map(({ participants, shiftedNumber }) => [...participants.map(({ name }) => name), shiftedNumber]));
 
     const shiftListHistoryOnlyParticipantsNames = shiftListHistory.map(
         ({ participants }) => participants.map(({ name }) => name)
