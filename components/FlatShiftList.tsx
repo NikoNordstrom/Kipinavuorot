@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, FlatList, TouchableOpacity, Text, View, ViewStyle, ScrollView } from "react-native";
-import { ShiftTime, ShiftParticipant, ShiftList } from "../shift-generator";
+import { ShiftTime, ShiftParticipant, ShiftList } from "../src/shift-generator";
 
 interface FlatShiftListProps extends ShiftList {
     style?: ViewStyle;

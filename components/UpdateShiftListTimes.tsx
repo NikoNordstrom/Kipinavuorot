@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, ViewStyle, StyleSheet } from "react-native";
 import TextInput, { TextInputProps } from "./TextInput";
 import Button from "./Button";
-import { ShiftList, ShiftTime } from "../shift-generator";
+import { ShiftList, ShiftTime } from "../src/shift-generator";
 import { ShiftTimeTexts } from "../App";
 
 interface UpdateShiftListTimesProps {

@@ -17,7 +17,7 @@ function ShiftListHistoryItem(props: ShiftListHistoryItemProps) {
 
     return (
         <View style={styles.shiftListHistoryItem}>
-            <Text>{shiftList.shiftsGeneratedTimestamp}</Text>
+            <Text>{shiftList.timestamp}</Text>
             <Text>{shiftList.participants.length} osallistujaa</Text>
         </View>
     );
@@ -36,8 +36,8 @@ export default function PreviousShiftLists(props: PreviousShiftListsProps) {
         <View style={styles.container}>
             <SectionList
                 sections={DATA}
-                keyExtractor={({ shiftsGeneratedTimestamp }, index) => (
-                    shiftsGeneratedTimestamp ? shiftsGeneratedTimestamp : "" + index
+                keyExtractor={({ timestamp }, index) => (
+                    timestamp ? timestamp : "" + index
                 )}
                 renderItem={({ item }) => <ShiftListHistoryItem shiftList={item} />}
                 renderSectionHeader={({ section: { title } }) => (

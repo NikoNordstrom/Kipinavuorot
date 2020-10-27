@@ -13,7 +13,7 @@ export interface ShiftList {
     firstShiftStartTime: ShiftTime;
     lastShiftEndTime: ShiftTime;
     participants: ShiftParticipant[];
-    shiftedNumber?: number;
+    shiftedNumber: number;
     timestamp?: string;
 }
 
@@ -50,6 +50,51 @@ function generateEmptyShifts(shiftList: ShiftList): ShiftParticipant[] {
     });
 }
 
+function roundShiftMinutesToFive(shiftParticipants: ShiftParticipant[]): ShiftParticipant[] {
+    const newShiftParticipants: ShiftParticipant[] = JSON.parse(JSON.stringify(shiftParticipants));
+
+    let allExtraMinutes = 0;
+
+    // Calculate all extra minutes and remove extra minutes from participants shiftEndTime.minutes property.
+    // This also sets the current participants shiftEndTime to equal the next participants shiftStartTime
+    // (except if the current participant is the last participant) so that when we change
+    // the current participants shiftEndTime property it also changes the next participants shiftStartTime property.
+    for (let i = 0; i < newShiftParticipants.length; i++) {
+        const extraMinutes = newShiftParticipants[i].shiftEndTime.minutes % 5;
+        allExtraMinutes += extraMinutes;
+
+        if (i === newShiftParticipants.length - 1) break;
+        newShiftParticipants[i].shiftEndTime = newShiftParticipants[i + 1].shiftStartTime;
+        newShiftParticipants[i].shiftEndTime.minutes -= extraMinutes;
+    }
+
+    // Add minutes to allExtraMinutes so that it becomes divisible by 5.
+    if (allExtraMinutes % 5 !== 0) allExtraMinutes += 5 - allExtraMinutes % 5;
+
+    let participantIndex = 0;
+
+    // Loop through newShiftParticipants and add 5 minutes to current participants shiftEndTime.minutes
+    // and substract 5 from allExtraMinutes until its value is 0. Skip the last participant to the first participant.
+    // This also corrects shiftEndTime.hours and shiftEndTime.minutes values if necessary.
+    while (allExtraMinutes / 5 > 0) {
+        if (participantIndex === newShiftParticipants.length - 1) participantIndex = 0;
+
+        const newShiftEndMinutes = newShiftParticipants[participantIndex].shiftEndTime.minutes += 5;
+        allExtraMinutes -= 5;
+
+        if (newShiftEndMinutes >= 60) {
+            newShiftParticipants[participantIndex].shiftEndTime.minutes = 0;
+            const newShiftEndHours = newShiftParticipants[participantIndex].shiftEndTime.hours += 1;
+
+            if (newShiftEndHours === 24) newShiftParticipants[participantIndex].shiftEndTime.hours = 0;
+        }
+
+        participantIndex++;
+    }
+
+    return newShiftParticipants;
+}
+
 function generateRandomShifts(shiftList: ShiftList): ShiftParticipant[] {
     const participantsNames = shiftList.participants.map(({ name }) => name);
 
@@ -75,37 +120,6 @@ function shiftParticipantsNames(participantsNames: string[], numberOfShifts: num
     return newParticipantsNames;
 }
 
-function roundShiftMinutesToFive(shiftParticipants: ShiftParticipant[]): ShiftParticipant[] {
-    let allExtraMinutes = 0;
-
-    shiftParticipants.forEach((participant) => {
-        allExtraMinutes += participant.shiftEndTime.minutes % 5;
-    });
-
-    for (let i = 0; i < 2; i++) {
-        if (allExtraMinutes / 5 >= 1) {
-            shiftParticipants[0].shiftEndTime.minutes -= shiftParticipants[0].shiftEndTime.minutes % 5;
-            shiftParticipants[0].shiftEndTime.minutes += 5;
-            if (shiftParticipants[0].shiftEndTime.minutes === 60) {
-                shiftParticipants[0].shiftEndTime.hours++;
-                shiftParticipants[0].shiftEndTime.minutes = 0;
-            }
-            allExtraMinutes -= 5;
-        }
-    }
-
-    shiftParticipants.forEach((participant, index) => {
-        if (index > 0) {
-            const shiftStartTime = { ...shiftParticipants[index - 1].shiftEndTime };
-            shiftParticipants[index].shiftStartTime = shiftStartTime;
-        }
-        if (index === shiftParticipants.length - 1) return;
-        const shiftEndTimeExtraMinutes = participant.shiftEndTime.minutes % 5;
-        shiftParticipants[index].shiftEndTime.minutes -= shiftEndTimeExtraMinutes;
-    });
-    return shiftParticipants;
-}
-
 export default function generateShifts(shiftList: ShiftList, shiftListHistory?: ShiftList[], randomShifts?: boolean): ShiftList {
     // This makes a new copy of shiftList so that changes won't affect the original object.
     const newShiftList: ShiftList = {
@@ -120,7 +134,7 @@ export default function generateShifts(shiftList: ShiftList, shiftListHistory?: 
         return newShiftList;
     }
 
-    const previouslyShifted: { shiftedNumber: number; count: number }[] = [];
+    let previouslyShifted: { shiftedNumber: number; count: number }[] = [];
 
     let baseShiftListIndex = 0;
 
@@ -147,16 +161,18 @@ export default function generateShifts(shiftList: ShiftList, shiftListHistory?: 
     }
     
     // If the current shiftList.participants.length is not changed from the previous one then
-    // count and add all previously shifted numbers starting from baseShiftListIndex to previouslyShifted array
-    // except the ones that are larger than the current shiftList.participants.length.
+    // count and add all previously shifted numbers starting from the next index of baseShiftListIndex to previouslyShifted array
+    // except the ones that are larger than or equal to the current shiftList.participants.length.
     if (shiftList.participants.length === shiftListHistory[shiftListHistory.length - 1].participants.length) {
         for (let i = baseShiftListIndex + 1; i < shiftListHistory.length; i++) {
-            const previouslyShiftedIndex = previouslyShifted.findIndex(({ shiftedNumber }) => shiftedNumber === shiftListHistory[i].shiftedNumber);
+            const previouslyShiftedIndex = previouslyShifted.findIndex(
+                ({ shiftedNumber }) => shiftedNumber === shiftListHistory[i].shiftedNumber
+            );
     
             if (previouslyShiftedIndex > -1) previouslyShifted[previouslyShiftedIndex].count++;
-            else if ((shiftListHistory[i].shiftedNumber || shiftList.participants.length) < shiftList.participants.length) {
-                if (shiftListHistory[i].shiftedNumber === 0 || !shiftListHistory[i].shiftedNumber) continue;
-                previouslyShifted.push({ shiftedNumber: shiftListHistory[i].shiftedNumber || 0, count: 1 });
+            else if (shiftListHistory[i].shiftedNumber < shiftList.participants.length) {
+                if (shiftListHistory[i].shiftedNumber === 0) continue;
+                previouslyShifted.push({ shiftedNumber: shiftListHistory[i].shiftedNumber, count: 1 });
             }
         }
     }
@@ -180,11 +196,10 @@ export default function generateShifts(shiftList: ShiftList, shiftListHistory?: 
         if (previouslyShifted[i].count > previouslyShifted[i - 1].count) previouslyShifted.splice(i);
     }
 
-    // If all possible shifts are made then remove the last shifted number from the previouslyShifted array.
-    if (previouslyShifted.length === shiftList.participants.length - 1) {
-        const previouslyShiftedNumber = shiftListHistory[shiftListHistory.length - 1].shiftedNumber;
-        const previouslyShiftedDeleteIndex = previouslyShifted.findIndex(({ shiftedNumber }) => shiftedNumber === previouslyShiftedNumber);
-        if (previouslyShiftedDeleteIndex > 0) previouslyShifted.splice(previouslyShiftedDeleteIndex, 1);
+    // If all possible shifts are made and the last shifted number is more than 0 then
+    // clear previouslyShifted array and add only the baseShiftList.shiftedNumber (which is 0).
+    if (previouslyShifted.length === shiftList.participants.length - 1 && shiftListHistory[shiftListHistory.length - 1].shiftedNumber > 0) {
+        previouslyShifted = [{ shiftedNumber: 0, count: 0 }];
     }
 
     let mostSuitableNumberOfShifts = Math.floor(Math.random() * (shiftList.participants.length - 1)) + 1;

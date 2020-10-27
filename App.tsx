@@ -59,7 +59,8 @@ export default function App() {
     const emptyShiftList: ShiftList = {
         firstShiftStartTime: { hours: 0, minutes: 0 },
         lastShiftEndTime: { hours: 0, minutes: 0 },
-        participants: []
+        participants: [],
+        shiftedNumber: 0
     };
 
     const dateFormat = (timestampMilliseconds: number) => {
@@ -126,7 +127,8 @@ export default function App() {
                     shiftList: {
                         firstShiftStartTime: emptyShiftList.firstShiftStartTime,
                         lastShiftEndTime: emptyShiftList.lastShiftEndTime,
-                        participants: state.shiftList.participants
+                        participants: state.shiftList.participants,
+                        shiftedNumber: 0
                     }
                 });
                 return true;
@@ -211,7 +213,7 @@ export default function App() {
         }
 
         if (selectedShiftListHistoryIndex === -1 || !usePreviousShiftList) {
-            const shiftListDateString = dateFormat(Number.parseInt(state.shiftList.shiftsGeneratedTimestamp || nowWithOffset.toString()));
+            const shiftListDateString = dateFormat(Number.parseInt(state.shiftList.timestamp || nowWithOffset.toString()));
 
             newShiftListHistory.unshift({
                 currentlySelected: true,
