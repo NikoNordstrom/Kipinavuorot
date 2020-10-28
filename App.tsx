@@ -94,12 +94,12 @@ export default function App() {
             ...newState
         };
         AsyncStorage.setItem("state", JSON.stringify(newState));
-        [
-            "\n",
-            JSON.stringify({ ...newState, shiftList: undefined, shiftListHistory: undefined }),
-            JSON.stringify({ shiftList: newState.shiftList }),
-            JSON.stringify({ shiftListHistory: newState.shiftListHistory })
-        ].forEach(v => console.log(v));
+
+        console.log("STATE UPDATED!");
+        if (JSON.stringify(state.shiftListHistory) !== JSON.stringify(newState.shiftListHistory)) console.log("SHIFTLIST HISTORY UPDATED: " + JSON.stringify(
+            newState.shiftListHistory.map(({ shiftLists }) => shiftLists.map(({ participants, shiftedNumber }) => [...participants.map(({ name }) => name), shiftedNumber])))
+        );
+
         setState(newState);
     };
 
@@ -176,24 +176,26 @@ export default function App() {
     };
 
     const generateNewShifts = (basedOnShiftListHistory?: boolean) => {
-        const selectedShiftListHistory = basedOnShiftListHistory
-            ? state.shiftListHistory.find(({ currentlySelected }) => currentlySelected)
-            : undefined;
+        const selectedShiftListHistoryIndex = basedOnShiftListHistory
+            ? state.shiftListHistory.findIndex(({ currentlySelected }) => currentlySelected)
+            : -1;
+
+        const shiftListHistory: ShiftList[] = selectedShiftListHistoryIndex > -1
+            ? JSON.parse(JSON.stringify(state.shiftListHistory[selectedShiftListHistoryIndex].shiftLists)).reverse()
+            : [];
+
+        const newShiftList = generateShifts(state.shiftList, shiftListHistory);
 
         updateState({
             ...state,
-            shiftList: generateShifts(
-                state.shiftList,
-                selectedShiftListHistory ? selectedShiftListHistory.shiftLists : []
-            ),
+            shiftList: newShiftList,
             shiftsGenerated: true
         });
     };
 
     const createNewShiftList = (usePreviousShiftList: boolean) => {
-        const newShiftListHistory = [...state.shiftListHistory];
+        const newShiftListHistory: ShiftListHistory[] = JSON.parse(JSON.stringify(state.shiftListHistory));
 
-        // Add shiftList to newShiftListHistory
         const selectedShiftListHistoryIndex = newShiftListHistory.findIndex(({ currentlySelected }) => currentlySelected);
 
         if (!usePreviousShiftList) {
@@ -222,7 +224,7 @@ export default function App() {
             });
         }
 
-        const emptyShiftTime = { hours: 0, minutes: 0 };
+        const emptyShiftTime: ShiftTime = { hours: 0, minutes: 0 };
 
         // Create new shiftList
         const newShiftList: ShiftList = {
@@ -343,7 +345,7 @@ const styles = StyleSheet.create({
         height: "100%",
         width: "100%",
         padding: 15,
-        backgroundColor: "#E8E8E8"
+        backgroundColor: "#E8E8F0"
     },
     header: {
         marginTop: 5,
