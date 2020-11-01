@@ -17,39 +17,6 @@ export interface ShiftList {
     timestamp?: string;
 }
 
-function generateEmptyShifts(shiftList: ShiftList): ShiftParticipant[] {
-    if (shiftList.participants.length < 1) return [];
-
-    const firstShiftStartTime = new Date();
-    const lastShiftEndTime = new Date();
-    firstShiftStartTime.setHours(shiftList.firstShiftStartTime.hours, shiftList.firstShiftStartTime.minutes, 0, 0);
-    lastShiftEndTime.setHours(shiftList.lastShiftEndTime.hours, shiftList.lastShiftEndTime.minutes, 0, 0);
-
-    // If lastShiftEndTime will be on the next day then set the correct date for that.
-    if (lastShiftEndTime.getHours() < firstShiftStartTime.getHours()) {
-        lastShiftEndTime.setDate(lastShiftEndTime.getDate() + 1);
-    }
-
-    const fullShiftLengthHours = Math.abs(firstShiftStartTime.getTime() - lastShiftEndTime.getTime()) / 1000 / 60 / 60;
-    const shiftDurationMinutes = fullShiftLengthHours / shiftList.participants.length * 60;
-
-    // Create ShiftParticipant array that includes all shift start and end times, but leave participant names empty.
-    return new Array(shiftList.participants.length).fill(null).map((value, index) => {
-        const lastShiftEndTimeMinutes = (firstShiftStartTime.getHours() * 60 + firstShiftStartTime.getMinutes()) + shiftDurationMinutes * index;
-        return {
-            name: "",
-            shiftStartTime: {
-                hours: Math.floor(lastShiftEndTimeMinutes / 60) % 24,
-                minutes: Math.floor(lastShiftEndTimeMinutes % 60)
-            },
-            shiftEndTime: {
-                hours: Math.floor((lastShiftEndTimeMinutes + shiftDurationMinutes) / 60) % 24,
-                minutes: Math.floor((lastShiftEndTimeMinutes + shiftDurationMinutes) % 60)
-            }
-        };
-    });
-}
-
 function roundShiftMinutesToFive(shiftParticipants: ShiftParticipant[]): ShiftParticipant[] {
     const newShiftParticipants: ShiftParticipant[] = JSON.parse(JSON.stringify(shiftParticipants));
 
@@ -95,11 +62,45 @@ function roundShiftMinutesToFive(shiftParticipants: ShiftParticipant[]): ShiftPa
     return newShiftParticipants;
 }
 
+function generateEmptyShifts(shiftList: ShiftList): ShiftParticipant[] {
+    if (shiftList.participants.length < 1) return [];
+
+    const firstShiftStartTime = new Date();
+    const lastShiftEndTime = new Date();
+    firstShiftStartTime.setHours(shiftList.firstShiftStartTime.hours, shiftList.firstShiftStartTime.minutes, 0, 0);
+    lastShiftEndTime.setHours(shiftList.lastShiftEndTime.hours, shiftList.lastShiftEndTime.minutes, 0, 0);
+
+    // If lastShiftEndTime will be on the next day then set the correct date for that.
+    if (lastShiftEndTime.getHours() < firstShiftStartTime.getHours()) {
+        lastShiftEndTime.setDate(lastShiftEndTime.getDate() + 1);
+    }
+
+    const fullShiftLengthHours = Math.abs(firstShiftStartTime.getTime() - lastShiftEndTime.getTime()) / 1000 / 60 / 60;
+    const shiftDurationMinutes = fullShiftLengthHours / shiftList.participants.length * 60;
+
+    // Create ShiftParticipant array that includes all shift start and end times, but leave participant names empty.
+    const newShiftParticipantArray: ShiftParticipant[] = new Array(shiftList.participants.length).fill(null).map((value, index) => {
+        const lastShiftEndTimeMinutes = (firstShiftStartTime.getHours() * 60 + firstShiftStartTime.getMinutes()) + shiftDurationMinutes * index;
+        return {
+            name: "",
+            shiftStartTime: {
+                hours: Math.floor(lastShiftEndTimeMinutes / 60) % 24,
+                minutes: Math.floor(lastShiftEndTimeMinutes % 60)
+            },
+            shiftEndTime: {
+                hours: Math.floor((lastShiftEndTimeMinutes + shiftDurationMinutes) / 60) % 24,
+                minutes: Math.floor((lastShiftEndTimeMinutes + shiftDurationMinutes) % 60)
+            }
+        };
+    });
+
+    return roundShiftMinutesToFive(newShiftParticipantArray);
+}
+
 function generateRandomShifts(shiftList: ShiftList): ShiftParticipant[] {
     const participantsNames = shiftList.participants.map(({ name }) => name);
 
-    let emptyShiftList = generateEmptyShifts(shiftList);
-    emptyShiftList = roundShiftMinutesToFive(emptyShiftList);
+    const emptyShiftList = generateEmptyShifts(shiftList);
 
     // Add all of the participants names to randomly selected participants with shifts.
     return emptyShiftList.map(shiftParticipant => {
