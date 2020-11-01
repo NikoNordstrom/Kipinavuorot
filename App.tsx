@@ -32,6 +32,7 @@ export interface State {
     shiftListHistory: ShiftListHistory[];
     shiftListTimesUpdated: boolean;
     shiftListReady: boolean;
+    generatingNewShifts: boolean;
     shiftsGenerated: boolean;
     newShiftListModalVisible: boolean;
     header: {
@@ -78,6 +79,7 @@ export default function App() {
         }],
         shiftListTimesUpdated: false,
         shiftListReady: false,
+        generatingNewShifts: false,
         shiftsGenerated: false,
         newShiftListModalVisible: false,
         header: {
@@ -139,6 +141,10 @@ export default function App() {
         return () => backHandler.remove();
     });
 
+    useEffect(() => {
+        if (state.generatingNewShifts) generateNewShifts();
+    }, [state.generatingNewShifts]);
+
     const updateShiftListTimes = (firstShiftStartTime: ShiftTime, lastShiftEndTime: ShiftTime) => {
         const shiftListTimeTexts = shiftListTimesToString(
             state.shiftList.firstShiftStartTime,
@@ -175,10 +181,8 @@ export default function App() {
         });
     };
 
-    const generateNewShifts = (basedOnShiftListHistory?: boolean) => {
-        const selectedShiftListHistoryIndex = basedOnShiftListHistory
-            ? state.shiftListHistory.findIndex(({ currentlySelected }) => currentlySelected)
-            : -1;
+    const generateNewShifts = () => {
+        const selectedShiftListHistoryIndex = state.shiftListHistory.findIndex(({ currentlySelected }) => currentlySelected);
 
         const shiftListHistory: ShiftList[] = selectedShiftListHistoryIndex > -1
             ? JSON.parse(JSON.stringify(state.shiftListHistory[selectedShiftListHistoryIndex].shiftLists)).reverse()
@@ -186,11 +190,12 @@ export default function App() {
 
         const newShiftList = generateShifts(state.shiftList, shiftListHistory);
 
-        updateState({
+        setTimeout(() => updateState({
             ...state,
             shiftList: newShiftList,
+            generatingNewShifts: false,
             shiftsGenerated: true
-        });
+        }), 200);
     };
 
     const createNewShiftList = (usePreviousShiftList: boolean) => {
@@ -308,11 +313,16 @@ export default function App() {
                             : null
                     }
                     {
-                        state.shiftList.participants.length > 0
+                        state.generatingNewShifts ? <View style={styles.activityIndicatorContainer}>
+                            <ActivityIndicator color="mediumseagreen" size="large" />
+                        </View> : null
+                    }
+                    {
+                        state.shiftList.participants.length > 0 && !state.generatingNewShifts
                             ? <FlatShiftList {...state.shiftList} style={{ flex: 1 }} /> : null
                     }
                     {
-                        state.shiftListReady
+                        state.shiftListReady && !state.generatingNewShifts
                             ? <View style={styles.newShiftsButtonContainer}>
                                 <Button
                                     style={{ flex: 1, marginRight: 15 }}
@@ -323,7 +333,7 @@ export default function App() {
                                     style={{ flex: 1 }}
                                     labelText="Jaa vuorot"
                                     disabled={state.shiftsGenerated}
-                                    onPress={generateNewShifts} />
+                                    onPress={() => updateState({ ...state, generatingNewShifts: true })} />
                             </View>
                             : null
                     }
@@ -380,5 +390,10 @@ const styles = StyleSheet.create({
     },
     newShiftsButtonContainer: {
         flexDirection: "row"
+    },
+    activityIndicatorContainer: {
+        marginBottom: "40%",
+        flex: 1,
+        justifyContent: "center"
     }
 });

@@ -41,7 +41,7 @@ export default function FlatShiftList(props: FlatShiftListProps) {
                     <View style={styles.header}>
                         <Text style={[styles.listItemTime, styles.headerItem]}>Alkaa</Text>
                         <Text style={[styles.listItemTime, styles.headerItem]}>Päättyy</Text>
-                        <Text style={styles.headerItem}>Osallistuja</Text>
+                        <Text style={styles.headerItem}>Nimi</Text>
                     </View>
                 } />
         </View>
