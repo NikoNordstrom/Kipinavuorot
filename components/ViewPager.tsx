@@ -5,6 +5,8 @@ import BaseViewPager, {
     ViewPagerOnPageScrollEventData
 } from "@react-native-community/viewpager";
 
+import { darkTheme } from "../src/themes";
+
 interface ViewPagerProps {
     children: ReactChildren;
     headerInfoRef: React.RefObject<Text>;
@@ -99,12 +101,13 @@ const styles = StyleSheet.create({
         flex: 0.5,
         textAlign: "center",
         fontSize: 17.5,
-        fontFamily: "Quicksand-Medium"
+        fontFamily: "Quicksand-Medium",
+        color: darkTheme.colors.text
     },
     tabsUnderline: {
         height: 2,
         width: "50%",
-        backgroundColor: "mediumseagreen"
+        backgroundColor: darkTheme.colors.primary
     },
     viewPager: {
         marginTop: 15,

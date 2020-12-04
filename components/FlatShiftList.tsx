@@ -1,6 +1,8 @@
 import React from "react";
 import { StyleSheet, FlatList, TouchableOpacity, Text, View, ViewStyle, ScrollView } from "react-native";
+
 import { ShiftTime, ShiftParticipant, ShiftList } from "../src/shift-generator";
+import { darkTheme } from "../src/themes";
 
 interface FlatShiftListProps extends ShiftList {
     style?: ViewStyle;
@@ -55,22 +57,25 @@ const styles = StyleSheet.create({
     },
     headerItem: {
         fontSize: 15,
-        fontFamily: "Quicksand-Medium"
+        fontFamily: "Quicksand-Medium",
+        color: darkTheme.colors.text
     },
     listItem: {
         flexDirection: "row",
         paddingVertical: 7.5,
         borderBottomWidth: 1,
-        borderBottomColor: "#CCCCCC"
+        borderBottomColor: darkTheme.colors.border
     },
     listItemTime: {
         flexBasis: "17.5%",
         marginRight: 10,
         fontSize: 20,
-        fontFamily: "Quicksand-Medium"
+        fontFamily: "Quicksand-Medium",
+        color: darkTheme.colors.text
     },
     listItemName: {
         fontSize: 20,
-        fontFamily: "Quicksand-Regular"
+        fontFamily: "Quicksand-Regular",
+        color: darkTheme.colors.text
     }
 });

@@ -2,6 +2,7 @@ import React from "react";
 import { Modal, View, Text, StyleSheet } from "react-native";
 
 import Button from "./Button";
+import { darkTheme } from "../src/themes";
 
 interface Props {
     visible: boolean;
@@ -46,25 +47,27 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.15)"
+        backgroundColor: "rgba(22, 22, 24, 0.5)"
     },
     modalView: {
         margin: 30,
         padding: 20,
         borderRadius: 10,
-        backgroundColor: "white",
+        backgroundColor: darkTheme.colors.card,
         elevation: 5
     },
     modalTitle: {
         marginBottom: 5,
         fontSize: 25,
         fontFamily: "Quicksand-Bold",
-        includeFontPadding: false
+        includeFontPadding: false,
+        color: darkTheme.colors.text
     },
     modalText: {
         fontSize: 20,
         fontFamily: "Quicksand-Medium",
-        includeFontPadding: false
+        includeFontPadding: false,
+        color: darkTheme.colors.text
     },
     modalButtonContainer: {
         marginTop: 15,

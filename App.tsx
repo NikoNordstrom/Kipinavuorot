@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { StyleSheet, View, Text, BackHandler, ActivityIndicator } from "react-native";
+import { StyleSheet, View, Text, BackHandler, ActivityIndicator, StatusBar } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 
 import generateShifts, {
@@ -15,6 +15,8 @@ import AddShiftParticipant from "./components/AddShiftParticipant";
 import Button from "./components/Button";
 import YesNoModal from "./components/YesNoModal";
 import PreviousShiftLists from "./components/PreviousShiftLists";
+
+import { darkTheme } from "./src/themes";
 
 export interface ShiftTimeTexts {
     firstStart: string;
@@ -261,6 +263,7 @@ export default function App() {
 
     return !state.fetchedState ? null : (
         <View style={styles.background}>
+            <StatusBar backgroundColor={darkTheme.colors.background} />
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>{state.header.title}</Text>
                 {
@@ -314,7 +317,7 @@ export default function App() {
                     }
                     {
                         state.generatingNewShifts ? <View style={styles.activityIndicatorContainer}>
-                            <ActivityIndicator color="mediumseagreen" size="large" />
+                            <ActivityIndicator color={darkTheme.colors.primary} size="large" />
                         </View> : null
                     }
                     {
@@ -355,41 +358,46 @@ const styles = StyleSheet.create({
         height: "100%",
         width: "100%",
         padding: 15,
-        backgroundColor: "#E8E8F0"
+        paddingTop: 0,
+        backgroundColor: darkTheme.colors.background
     },
     header: {
-        marginTop: 5,
+        marginTop: 15,
         marginLeft: 5,
         marginBottom: 10
     },
     headerTitle: {
         fontSize: 25,
         includeFontPadding: false,
-        fontFamily: "Quicksand-Bold"
+        fontFamily: "Quicksand-Bold",
+        color: darkTheme.colors.text
     },
     headerInfo: {
         height: 25,
         fontSize: 20,
         includeFontPadding: false,
-        fontFamily: "Quicksand-Medium"
+        fontFamily: "Quicksand-Medium",
+        color: darkTheme.colors.text
     },
     viewPager: {
         padding: 15,
         paddingTop: 0,
         flex: 1,
         borderRadius: 10,
-        backgroundColor: "white"
+        backgroundColor: darkTheme.colors.card
     },
     noPreviousShiftListsFound: {
         flex: 1,
         marginTop: "40%",
         textAlign: "center",
-        opacity: 0.3,
+        opacity: 0.4,
         fontSize: 25,
-        fontFamily: "Quicksand-Regular"
+        fontFamily: "Quicksand-Regular",
+        color: darkTheme.colors.text
     },
     newShiftsButtonContainer: {
-        flexDirection: "row"
+        flexDirection: "row",
+        marginTop: 15
     },
     activityIndicatorContainer: {
         marginBottom: "40%",

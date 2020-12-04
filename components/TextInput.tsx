@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, TextInput as BaseTextInput, TextInputProps as BaseTextInputProps, StyleSheet, ViewStyle } from "react-native";
 
+import { darkTheme } from "../src/themes";
+
 export interface TextInputProps extends BaseTextInputProps {
     labelText: string;
     style?: ViewStyle;
@@ -25,18 +27,22 @@ const styles = StyleSheet.create({
     },
     label: {
         marginLeft: 5,
-        marginBottom: 1,
+        marginBottom: 2,
         fontSize: 15,
-        fontFamily: "Quicksand-Medium"
+        fontFamily: "Quicksand-Medium",
+        color: darkTheme.colors.text
     },
     baseTextInput: {
         height: 45,
         padding: 10,
         borderWidth: 1,
         borderRadius: 10,
+        borderColor: darkTheme.colors.border,
+        backgroundColor: darkTheme.colors.fill,
         fontSize: 20,
         fontFamily: "Quicksand-Regular",
         includeFontPadding: false,
-        textAlignVertical: "center"
+        textAlignVertical: "center",
+        color: darkTheme.colors.text
     }
 });
