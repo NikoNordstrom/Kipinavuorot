@@ -71,15 +71,17 @@ export default function ViewPager(props: ViewPagerProps) {
 
     return (
         <View style={style}>
-            <View style={styles.tabsHeaderContainer}>
-                <Text
-                    style={[styles.tabHeader, state.progress.offset < 0.5 ? { fontFamily: "Quicksand-Bold" } : null]}
-                    onPress={() => goToPage(0)}>Nykyinen</Text>
-                <Text
-                    style={[styles.tabHeader, state.progress.offset >= 0.5 ? { fontFamily: "Quicksand-Bold" } : null]}
-                    onPress={() => goToPage(1)}>Aiemmat</Text>
+            <View style={styles.headerContainer}>
+                <View style={styles.tabsHeaderContainer}>
+                    <Text
+                        style={[styles.tabHeader, state.progress.offset < 0.5 ? { fontFamily: "Quicksand-Bold" } : null]}
+                        onPress={() => goToPage(0)}>Nykyinen</Text>
+                    <Text
+                        style={[styles.tabHeader, state.progress.offset >= 0.5 ? { fontFamily: "Quicksand-Bold" } : null]}
+                        onPress={() => goToPage(1)}>Aiemmat</Text>
+                </View>
+                <View style={[styles.tabsUnderline, { left: `${state.progress.offset * 50}%` }]} />
             </View>
-            <View style={[styles.tabsUnderline, { left: `${state.progress.offset * 50}%` }]} />
             <BaseViewPager
                 style={styles.viewPager}
                 ref={viewPager}
@@ -92,6 +94,10 @@ export default function ViewPager(props: ViewPagerProps) {
 }
 
 const styles = StyleSheet.create({
+    headerContainer: {
+        paddingLeft: 15,
+        paddingRight: 15
+    },
     tabsHeaderContainer: {
         flexDirection: "row"
     },

@@ -3,6 +3,7 @@ import { StyleSheet, SectionList, View, Text } from "react-native";
 
 import { ShiftList } from "../src/shift-generator";
 import { ShiftListHistory } from "../App";
+import { darkTheme } from "../src/themes";
 
 interface PreviousShiftListsProps {
     shiftListHistory: ShiftListHistory[];
@@ -16,9 +17,9 @@ function ShiftListHistoryItem(props: ShiftListHistoryItemProps) {
     const { shiftList } = props;
 
     return (
-        <View style={styles.shiftListHistoryItem}>
-            <Text>{shiftList.timestamp}</Text>
-            <Text>{shiftList.participants.length} osallistujaa</Text>
+        <View style={styles.item}>
+            <Text style={styles.itemTitle}>{shiftList.timestamp}</Text>
+            <Text style={styles.itemInfo}>{shiftList.participants.length} osallistujaa</Text>
         </View>
     );
 }
@@ -33,16 +34,16 @@ export default function PreviousShiftLists(props: PreviousShiftListsProps) {
     }));
 
     return (
-        <View style={styles.container}>
+        <View>
             <SectionList
                 sections={DATA}
                 keyExtractor={({ timestamp }, index) => (
                     timestamp ? timestamp : "" + index
                 )}
                 renderItem={({ item }) => <ShiftListHistoryItem shiftList={item} />}
-                renderSectionHeader={({ section: { title } }) => (
+                renderSectionHeader={({ section: { title, currentlySelected } }) => (
                     <View>
-                        <Text>{title}</Text>
+                        <Text style={[styles.headerTitle, currentlySelected ? styles.currentlySelectedIndicator : null]}>{title}</Text>
                     </View>
                 )}
             />
@@ -51,11 +52,22 @@ export default function PreviousShiftLists(props: PreviousShiftListsProps) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1
+    headerTitle: {
+        fontFamily: "Quicksand-Bold",
+        fontSize: 17.5,
+        color: darkTheme.colors.text
     },
-    shiftListHistoryItem: {
-        width: "100%",
+    currentlySelectedIndicator: {
+        textDecorationLine: "underline"
+    },
+    item: {
+        // width: "100%",
         padding: 15
+    },
+    itemTitle: {
+        color: darkTheme.colors.text
+    },
+    itemInfo: {
+        color: darkTheme.colors.text
     }
 });

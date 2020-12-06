@@ -205,12 +205,6 @@ export default function App() {
 
         const selectedShiftListHistoryIndex = newShiftListHistory.findIndex(({ currentlySelected }) => currentlySelected);
 
-        if (!usePreviousShiftList) {
-            newShiftListHistory.forEach(({ currentlySelected }, index) => {
-                if (currentlySelected) newShiftListHistory[index].currentlySelected = false;
-            });
-        }
-
         const nowWithOffset = Date.now() - new Date().getTimezoneOffset() * 60 * 1000;
 
         if (selectedShiftListHistoryIndex > -1) {
@@ -219,14 +213,24 @@ export default function App() {
             if (newShiftListHistory[selectedShiftListHistoryIndex].title === "") {
                 newShiftListHistory[selectedShiftListHistoryIndex].title = dateFormat(nowWithOffset);
             }
-        }
 
-        if (selectedShiftListHistoryIndex === -1 || !usePreviousShiftList) {
-            const shiftListDateString = dateFormat(Number.parseInt(state.shiftList.timestamp || nowWithOffset.toString()));
+            if (!usePreviousShiftList) {
+                newShiftListHistory[selectedShiftListHistoryIndex].currentlySelected = false;
+
+                if (newShiftListHistory[selectedShiftListHistoryIndex].title !== dateFormat(nowWithOffset)) {
+                    newShiftListHistory[selectedShiftListHistoryIndex].title += ` - ${dateFormat(nowWithOffset)}`;
+                }
+            }
+        }
+        
+        if (selectedShiftListHistoryIndex === -1) {
+            const shiftListDateString = state.shiftList.timestamp
+                ? dateFormat(Date.parse(state.shiftList.timestamp))
+                : dateFormat(nowWithOffset);
 
             newShiftListHistory.unshift({
                 currentlySelected: true,
-                title: `${shiftListDateString} - ${dateFormat(nowWithOffset)}`,
+                title: `${shiftListDateString}`,
                 shiftLists: [state.shiftList]
             });
         }
@@ -294,7 +298,7 @@ export default function App() {
                 style={styles.viewPager}
                 headerInfoRef={headerInfoRef}
                 headerInfoFullHeight={state.headerInfoFullHeight}>
-                <View key="Nykyinen">
+                <View key="Nykyinen" style={styles.page}>
                     {
                         !state.shiftListReady && !state.shiftListTimesUpdated
                             ? <UpdateShiftListTimes
@@ -341,7 +345,7 @@ export default function App() {
                             : null
                     }
                 </View>
-                <View key="Aiemmat" style={{ flex: 1 }}>
+                <View key="Aiemmat" style={styles.page}>
                     {
                         state.shiftListHistory.length > 0 && state.shiftListHistory[0].shiftLists.length > 0
                             ? <PreviousShiftLists shiftListHistory={state.shiftListHistory} />
@@ -380,11 +384,13 @@ const styles = StyleSheet.create({
         color: darkTheme.colors.text
     },
     viewPager: {
-        padding: 15,
-        paddingTop: 0,
         flex: 1,
         borderRadius: 10,
         backgroundColor: darkTheme.colors.card
+    },
+    page: {
+        padding: 15,
+        paddingTop: 0
     },
     noPreviousShiftListsFound: {
         flex: 1,

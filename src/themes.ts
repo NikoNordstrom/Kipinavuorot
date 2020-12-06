@@ -13,11 +13,11 @@ export interface Theme {
 export const darkTheme: Theme = {
     dark: true,
     colors: {
-        primary: "rgb(235, 194, 0)",
-        background: "rgb(24, 24, 26)",
-        card: "rgb(34, 34, 36)",
-        fill: "rgb(28, 28, 30)",
+        primary: "rgb(255, 195, 0)",
+        background: "rgb(28, 28, 31)",
+        card: "rgb(36, 36, 38)",
+        fill: "rgb(30, 30, 32)",
         text: "rgb(186, 186, 186)",
-        border: "rgb(22, 22, 24)"
+        border: "rgb(24, 24, 27)"
     }
 };
