@@ -1,9 +1,10 @@
 import React from "react";
 import { StyleSheet, SectionList, View, Text } from "react-native";
 
-import { ShiftList } from "../src/shift-generator";
+import { ShiftList } from "../ts/shift-generator";
 import { ShiftListHistory } from "../App";
-import { darkTheme } from "../src/themes";
+import { darkTheme } from "../ts/themes";
+import { dateFormat, timeFormat } from "../ts/tools";
 
 interface PreviousShiftListsProps {
     shiftListHistory: ShiftListHistory[];
@@ -16,9 +17,11 @@ interface ShiftListHistoryItemProps {
 function ShiftListHistoryItem(props: ShiftListHistoryItemProps) {
     const { shiftList } = props;
 
+    const shiftTimeText = `${timeFormat(shiftList.firstShiftStartTime)} - ${timeFormat(shiftList.lastShiftEndTime)}`;
+
     return (
         <View style={styles.item}>
-            <Text style={styles.itemTitle}>{shiftList.timestamp}</Text>
+            <Text style={styles.itemTitle}>{`${shiftTimeText} (${dateFormat(shiftList.timestamp || "")})`}</Text>
             <Text style={styles.itemInfo}>{shiftList.participants.length} osallistujaa</Text>
         </View>
     );
@@ -53,6 +56,7 @@ export default function PreviousShiftLists(props: PreviousShiftListsProps) {
 
 const styles = StyleSheet.create({
     headerTitle: {
+        marginVertical: 5,
         fontFamily: "Quicksand-Bold",
         fontSize: 17.5,
         color: darkTheme.colors.text
@@ -61,8 +65,10 @@ const styles = StyleSheet.create({
         textDecorationLine: "underline"
     },
     item: {
-        // width: "100%",
-        padding: 15
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderLeftWidth: 1,
+        borderColor: darkTheme.colors.text
     },
     itemTitle: {
         color: darkTheme.colors.text

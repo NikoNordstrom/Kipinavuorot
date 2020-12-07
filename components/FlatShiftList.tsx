@@ -1,8 +1,9 @@
 import React from "react";
 import { StyleSheet, FlatList, TouchableOpacity, Text, View, ViewStyle, ScrollView } from "react-native";
 
-import { ShiftTime, ShiftParticipant, ShiftList } from "../src/shift-generator";
-import { darkTheme } from "../src/themes";
+import { ShiftParticipant, ShiftList } from "../ts/shift-generator";
+import { darkTheme } from "../ts/themes";
+import { timeFormat } from "../ts/tools";
 
 interface FlatShiftListProps extends ShiftList {
     style?: ViewStyle;
@@ -11,16 +12,10 @@ interface FlatShiftListProps extends ShiftList {
 function ShiftListItem(participant: ShiftParticipant) {
     const { name, shiftStartTime, shiftEndTime } = participant;
 
-    const shiftTimeToString = (shiftTimeObject: ShiftTime) => {
-        const { hours, minutes } = shiftTimeObject;
-        if (hours === -1 && minutes === -1) return "00:00";
-        return `${hours < 10 ? `0${hours}` : hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
-    };
-
     return (
         <TouchableOpacity style={styles.listItem}>
-            <Text style={styles.listItemTime}>{shiftTimeToString(shiftStartTime)}</Text>
-            <Text style={styles.listItemTime}>{shiftTimeToString(shiftEndTime)}</Text>
+            <Text style={[styles.firstTwoColums, styles.listItemTime]}>{timeFormat(shiftStartTime)}</Text>
+            <Text style={[styles.firstTwoColums, styles.listItemTime]}>{timeFormat(shiftEndTime)}</Text>
             <ScrollView>
                 <Text style={styles.listItemName}>{name}</Text>
             </ScrollView>
@@ -41,8 +36,8 @@ export default function FlatShiftList(props: FlatShiftListProps) {
                 keyExtractor={({ name }, index) => `${name}${index}`}
                 ListHeaderComponent={
                     <View style={styles.header}>
-                        <Text style={[styles.listItemTime, styles.headerItem]}>Alkaa</Text>
-                        <Text style={[styles.listItemTime, styles.headerItem]}>Päättyy</Text>
+                        <Text style={[styles.firstTwoColums, styles.headerItem]}>Alkaa</Text>
+                        <Text style={[styles.firstTwoColums, styles.headerItem]}>Päättyy</Text>
                         <Text style={styles.headerItem}>Nimi</Text>
                     </View>
                 } />
@@ -60,22 +55,26 @@ const styles = StyleSheet.create({
         fontFamily: "Quicksand-Medium",
         color: darkTheme.colors.text
     },
+    firstTwoColums: {
+        flexBasis: "17.5%",
+        marginRight: 10
+    },
     listItem: {
         flexDirection: "row",
-        paddingVertical: 7.5,
+        paddingVertical: 9,
         borderBottomWidth: 1,
         borderBottomColor: darkTheme.colors.border
     },
     listItemTime: {
-        flexBasis: "17.5%",
-        marginRight: 10,
         fontSize: 20,
         fontFamily: "Quicksand-Medium",
+        includeFontPadding: false,
         color: darkTheme.colors.text
     },
     listItemName: {
         fontSize: 20,
         fontFamily: "Quicksand-Regular",
+        includeFontPadding: false,
         color: darkTheme.colors.text
     }
 });

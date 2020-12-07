@@ -2,7 +2,7 @@ import React from "react";
 import { Modal, View, Text, StyleSheet } from "react-native";
 
 import Button from "./Button";
-import { darkTheme } from "../src/themes";
+import { darkTheme } from "../ts/themes";
 
 interface Props {
     visible: boolean;

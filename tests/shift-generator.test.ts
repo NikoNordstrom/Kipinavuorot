@@ -1,4 +1,4 @@
-import generateShifts, { ShiftList, ShiftTime } from "./shift-generator";
+import generateShifts, { ShiftList, ShiftTime } from "../ts/shift-generator";
 
 const _participantsNames = ["a", "b", "c", "d", "e", "f", "g", "h"];
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TextInput as BaseTextInput, TextInputProps as BaseTextInputProps, StyleSheet, ViewStyle } from "react-native";
 
-import { darkTheme } from "../src/themes";
+import { darkTheme } from "../ts/themes";
 
 export interface TextInputProps extends BaseTextInputProps {
     labelText: string;

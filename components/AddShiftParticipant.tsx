@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, ViewStyle } from "react-native";
 import TextInput from "./TextInput";
 import Button from "./Button";
-import { ShiftList, ShiftParticipant } from "../src/shift-generator";
+import { ShiftList, ShiftParticipant } from "../ts/shift-generator";
 
 interface AddShiftParticipantProps {
     shiftList: ShiftList;

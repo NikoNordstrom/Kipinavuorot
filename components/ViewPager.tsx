@@ -5,7 +5,7 @@ import BaseViewPager, {
     ViewPagerOnPageScrollEventData
 } from "@react-native-community/viewpager";
 
-import { darkTheme } from "../src/themes";
+import { darkTheme } from "../ts/themes";
 
 interface ViewPagerProps {
     children: ReactChildren;

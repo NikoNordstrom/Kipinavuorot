@@ -6,7 +6,9 @@ import generateShifts, {
     ShiftList,
     ShiftTime,
     ShiftParticipant
-} from "./src/shift-generator";
+} from "./ts/shift-generator";
+import { darkTheme } from "./ts/themes";
+import { dateFormat, timeFormat } from "./ts/tools";
 
 import ViewPager from "./components/ViewPager";
 import FlatShiftList from "./components/FlatShiftList";
@@ -16,7 +18,6 @@ import Button from "./components/Button";
 import YesNoModal from "./components/YesNoModal";
 import PreviousShiftLists from "./components/PreviousShiftLists";
 
-import { darkTheme } from "./src/themes";
 
 export interface ShiftTimeTexts {
     firstStart: string;
@@ -46,15 +47,9 @@ export interface State {
 }
 
 function shiftListTimesToString(firstShiftStartTime: ShiftTime, lastShiftEndTime: ShiftTime): ShiftTimeTexts {
-    const { hours: startHours, minutes: startMinutes } = firstShiftStartTime;
-    const { hours: endHours, minutes: endMinutes } = lastShiftEndTime;
-
-    const firstShiftStartTimeText = `${startHours < 10 ? "0": ""}${startHours}:${startMinutes < 10 ? "0" : ""}${startMinutes}`;
-    const lastShiftEndTimeText = `${endHours < 10 ? "0": ""}${endHours}:${endMinutes < 10 ? "0" : ""}${endMinutes}`;
-
     return {
-        firstStart: firstShiftStartTimeText,
-        lastEnd: lastShiftEndTimeText
+        firstStart: timeFormat(firstShiftStartTime),
+        lastEnd: timeFormat(lastShiftEndTime)
     };
 }
 
@@ -64,12 +59,6 @@ export default function App() {
         lastShiftEndTime: { hours: 0, minutes: 0 },
         participants: [],
         shiftedNumber: 0
-    };
-
-    const dateFormat = (timestampMilliseconds: number) => {
-        const date = new Date(timestampMilliseconds);
-
-        return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
     };
 
     const [state, setState] = useState<State>({
@@ -225,7 +214,7 @@ export default function App() {
         
         if (selectedShiftListHistoryIndex === -1) {
             const shiftListDateString = state.shiftList.timestamp
-                ? dateFormat(Date.parse(state.shiftList.timestamp))
+                ? dateFormat(state.shiftList.timestamp)
                 : dateFormat(nowWithOffset);
 
             newShiftListHistory.unshift({
