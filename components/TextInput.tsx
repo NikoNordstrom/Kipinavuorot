@@ -1,22 +1,24 @@
 import React from "react";
-import { View, Text, TextInput as BaseTextInput, TextInputProps as BaseTextInputProps, StyleSheet, ViewStyle } from "react-native";
+import { View, Text, TextInput as BaseTextInput, TextInputProps as BaseTextInputProps, StyleSheet, ViewStyle, TextStyle } from "react-native";
 
 import { darkTheme } from "../ts/themes";
 
 export interface TextInputProps extends BaseTextInputProps {
     labelText: string;
     style?: ViewStyle;
+    textStyle?: TextStyle;
 }
 
 export default function TextInput(props: TextInputProps) {
-    const { labelText, style } = props;
+    const { labelText, style, textStyle } = props;
+    const placeholderTextColor = props.placeholderTextColor || darkTheme.colors.text;
 
     return (
         <View style={[styles.container, style]}>
             <Text style={styles.label}>{labelText}</Text>
             <BaseTextInput
-                {...props}
-                style={styles.baseTextInput} />
+                {...{ ...props, placeholderTextColor }}
+                style={{ ...styles.baseTextInput, ...textStyle }} />
         </View>
     );
 }

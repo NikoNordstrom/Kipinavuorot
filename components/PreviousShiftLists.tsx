@@ -21,7 +21,7 @@ function ShiftListHistoryItem(props: ShiftListHistoryItemProps) {
 
     return (
         <View style={styles.item}>
-            <Text style={styles.itemTitle}>{`${shiftTimeText} (${dateFormat(shiftList.timestamp || "")})`}</Text>
+            <Text style={styles.itemTitle}>{`${shiftTimeText}${shiftList.timestamp ? ` (${dateFormat(shiftList.timestamp)})` : ""}`}</Text>
             <Text style={styles.itemInfo}>{shiftList.participants.length} osallistujaa</Text>
         </View>
     );

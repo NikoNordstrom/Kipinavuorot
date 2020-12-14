@@ -17,6 +17,7 @@ import AddShiftParticipant from "./components/AddShiftParticipant";
 import Button from "./components/Button";
 import YesNoModal from "./components/YesNoModal";
 import PreviousShiftLists from "./components/PreviousShiftLists";
+import Time from "./components/Time";
 
 
 export interface ShiftTimeTexts {
@@ -368,8 +369,8 @@ const styles = StyleSheet.create({
     headerInfo: {
         height: 25,
         fontSize: 20,
+        fontFamily: "Nunito-SemiBold",
         includeFontPadding: false,
-        fontFamily: "Quicksand-Medium",
         color: darkTheme.colors.text
     },
     viewPager: {

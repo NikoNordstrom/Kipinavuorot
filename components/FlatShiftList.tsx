@@ -4,6 +4,7 @@ import { StyleSheet, FlatList, TouchableOpacity, Text, View, ViewStyle, ScrollVi
 import { ShiftParticipant, ShiftList } from "../ts/shift-generator";
 import { darkTheme } from "../ts/themes";
 import { timeFormat } from "../ts/tools";
+import Time from "./Time";
 
 interface FlatShiftListProps extends ShiftList {
     style?: ViewStyle;
@@ -14,8 +15,8 @@ function ShiftListItem(participant: ShiftParticipant) {
 
     return (
         <TouchableOpacity style={styles.listItem}>
-            <Text style={[styles.firstTwoColums, styles.listItemTime]}>{timeFormat(shiftStartTime)}</Text>
-            <Text style={[styles.firstTwoColums, styles.listItemTime]}>{timeFormat(shiftEndTime)}</Text>
+            <Time timeText={timeFormat(shiftStartTime)} style={styles.firstTwoColums} />
+            <Time timeText={timeFormat(shiftEndTime)} style={styles.firstTwoColums} />
             <ScrollView>
                 <Text style={styles.listItemName}>{name}</Text>
             </ScrollView>
@@ -64,12 +65,6 @@ const styles = StyleSheet.create({
         paddingVertical: 9,
         borderBottomWidth: 1,
         borderBottomColor: darkTheme.colors.border
-    },
-    listItemTime: {
-        fontSize: 20,
-        fontFamily: "Quicksand-Medium",
-        includeFontPadding: false,
-        color: darkTheme.colors.text
     },
     listItemName: {
         fontSize: 20,

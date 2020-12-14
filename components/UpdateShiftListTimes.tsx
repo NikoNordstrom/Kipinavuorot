@@ -70,12 +70,16 @@ export default function UpdateShiftListTimes(props: UpdateShiftListTimesProps) {
         return true;
     })();
 
-    const textInputProps: TextInputProps = {
-        labelText: "",
+    const textInputProps: Partial<TextInputProps> = {
+        textStyle: {
+            fontFamily: "Nunito-Regular",
+            includeFontPadding: true
+        },
         placeholder: defaultTimeText,
         editable: !done,
         maxLength: 5,
-        selectTextOnFocus: true
+        selectTextOnFocus: true,
+        keyboardType: "number-pad"
     };
         
     return !done ? (
