@@ -4,7 +4,8 @@ import { StyleSheet, SectionList, View, Text } from "react-native";
 import { ShiftList } from "../ts/shift-generator";
 import { ShiftListHistory } from "../App";
 import { darkTheme } from "../ts/themes";
-import { dateFormat, timeFormat } from "../ts/tools";
+import { dateFormat, timeFormat, addOpacity } from "../ts/tools";
+import Time from "./Time";
 
 interface PreviousShiftListsProps {
     shiftListHistory: ShiftListHistory[];
@@ -18,10 +19,11 @@ function ShiftListHistoryItem(props: ShiftListHistoryItemProps) {
     const { shiftList } = props;
 
     const shiftTimeText = `${timeFormat(shiftList.firstShiftStartTime)} - ${timeFormat(shiftList.lastShiftEndTime)}`;
+    const shiftDateText = `${shiftList.timestamp ? ` (${dateFormat(shiftList.timestamp)})` : ""}`;
 
     return (
         <View style={styles.item}>
-            <Text style={styles.itemTitle}>{`${shiftTimeText}${shiftList.timestamp ? ` (${dateFormat(shiftList.timestamp)})` : ""}`}</Text>
+            <Time timeText={`${shiftTimeText}${shiftDateText}`} style={styles.itemTitle} />
             <Text style={styles.itemInfo}>{shiftList.participants.length} osallistujaa</Text>
         </View>
     );
@@ -46,7 +48,13 @@ export default function PreviousShiftLists(props: PreviousShiftListsProps) {
                 renderItem={({ item }) => <ShiftListHistoryItem shiftList={item} />}
                 renderSectionHeader={({ section: { title, currentlySelected } }) => (
                     <View>
-                        <Text style={[styles.headerTitle, currentlySelected ? styles.currentlySelectedIndicator : null]}>{title}</Text>
+                        <Time
+                            timeText={title}
+                            fontWeight={"bold"}
+                            style={[
+                                styles.headerTitle,
+                                currentlySelected ? styles.currentlySelectedIndicator : null
+                            ]} />
                     </View>
                 )}
             />
@@ -55,25 +63,28 @@ export default function PreviousShiftLists(props: PreviousShiftListsProps) {
 }
 
 const styles = StyleSheet.create({
+    currentlySelectedIndicator: {
+        textDecorationLine: "underline"
+    },
     headerTitle: {
         marginVertical: 5,
         fontFamily: "Quicksand-Bold",
         fontSize: 17.5,
         color: darkTheme.colors.text
     },
-    currentlySelectedIndicator: {
-        textDecorationLine: "underline"
-    },
     item: {
+        marginBottom: 10,
         paddingVertical: 10,
         paddingHorizontal: 15,
-        borderLeftWidth: 1,
-        borderColor: darkTheme.colors.text
+        borderWidth: 1,
+        borderRadius: 10,
+        borderColor: darkTheme.colors.border
     },
     itemTitle: {
+        fontSize: 15,
         color: darkTheme.colors.text
     },
     itemInfo: {
-        color: darkTheme.colors.text
+        color: addOpacity(darkTheme.colors.text, 0.7)
     }
 });

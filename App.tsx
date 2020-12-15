@@ -17,8 +17,6 @@ import AddShiftParticipant from "./components/AddShiftParticipant";
 import Button from "./components/Button";
 import YesNoModal from "./components/YesNoModal";
 import PreviousShiftLists from "./components/PreviousShiftLists";
-import Time from "./components/Time";
-
 
 export interface ShiftTimeTexts {
     firstStart: string;
@@ -194,6 +192,7 @@ export default function App() {
         const newShiftListHistory: ShiftListHistory[] = JSON.parse(JSON.stringify(state.shiftListHistory));
 
         const selectedShiftListHistoryIndex = newShiftListHistory.findIndex(({ currentlySelected }) => currentlySelected);
+        console.log(selectedShiftListHistoryIndex);
 
         const nowWithOffset = Date.now() - new Date().getTimezoneOffset() * 60 * 1000;
 

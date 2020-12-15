@@ -14,10 +14,10 @@ export const darkTheme: Theme = {
     dark: true,
     colors: {
         primary: "rgb(255, 195, 0)",
-        background: "rgb(28, 28, 31)",
-        card: "rgb(36, 36, 38)",
-        fill: "rgb(30, 30, 32)",
-        text: "rgb(186, 186, 186)",
-        border: "rgb(24, 24, 27)"
+        background: "rgb(28, 28, 30)",
+        card: "rgb(38, 38, 40)",
+        fill: "rgb(32, 32, 34)",
+        text: "rgb(175, 175, 175)",
+        border: "rgb(26, 26, 28)"
     }
 };

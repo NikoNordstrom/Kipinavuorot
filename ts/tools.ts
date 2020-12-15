@@ -18,3 +18,7 @@ export function timeFormat(shiftTime: ShiftTime) {
 
     return `${zeroPrefix(hours)}:${zeroPrefix(minutes)}`;
 }
+
+export function addOpacity(rgbString: string, opacity: number) {
+    return `${rgbString.replace("rgb", "rgba").split(")")[0]}, ${opacity})`;
+}

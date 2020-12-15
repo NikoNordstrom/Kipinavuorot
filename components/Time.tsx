@@ -5,7 +5,7 @@ import { darkTheme } from "../ts/themes";
 
 export interface TimeProps extends BaseTextProps {
     timeText: string;
-    fontWeight?: "regular" | "medium";
+    fontWeight?: "regular" | "medium" | "bold";
 }
 
 export default function Time(props: TimeProps) {
@@ -13,7 +13,8 @@ export default function Time(props: TimeProps) {
 
     const fontFamily = fontWeight ? {
         "regular": "Nunito-Regular",
-        "medium": "Nunito-SemiBold"
+        "medium": "Nunito-SemiBold",
+        "bold": "Nunito-Bold"
     }[fontWeight] : styles.time.fontFamily;
 
     return (
