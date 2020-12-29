@@ -1,4 +1,4 @@
-import React, { ReactChildren, useState, useEffect } from "react";
+import React, { ReactNode, useState, useEffect } from "react";
 import { View, ViewStyle, Text, StyleSheet } from "react-native";
 import BaseViewPager, {
     ViewPagerOnPageSelectedEventData,
@@ -8,7 +8,7 @@ import BaseViewPager, {
 import { darkTheme } from "../ts/themes";
 
 interface ViewPagerProps {
-    children: ReactChildren;
+    children: ReactNode;
     headerInfoRef: React.RefObject<Text>;
     headerInfoFullHeight: number;
     style?: ViewStyle;
@@ -95,8 +95,7 @@ export default function ViewPager(props: ViewPagerProps) {
 
 const styles = StyleSheet.create({
     headerContainer: {
-        paddingLeft: 15,
-        paddingRight: 15
+        paddingHorizontal: 15
     },
     tabsHeaderContainer: {
         flexDirection: "row"

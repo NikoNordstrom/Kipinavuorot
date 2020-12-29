@@ -1,27 +1,39 @@
 import React from "react";
-import { View, Text, TextInput as BaseTextInput, TextInputProps as BaseTextInputProps, StyleSheet, ViewStyle, TextStyle } from "react-native";
+import {
+    View, Text,
+    TextInput as ReactNativeTextInput,
+    TextInputProps as ReactNativeTextInputProps,
+    StyleSheet, ViewStyle, TextStyle
+} from "react-native";
 
 import { darkTheme } from "../ts/themes";
+import { addOpacity } from "../ts/tools";
 
-export interface TextInputProps extends BaseTextInputProps {
+export interface TextInputProps extends ReactNativeTextInputProps {
     labelText: string;
+    ref?: React.RefObject<ReactNativeTextInput>;
     style?: ViewStyle;
     textStyle?: TextStyle;
 }
 
-export default function TextInput(props: TextInputProps) {
+const TextInput = React.forwardRef<ReactNativeTextInput, TextInputProps>((props: TextInputProps, ref) => {
     const { labelText, style, textStyle } = props;
-    const placeholderTextColor = props.placeholderTextColor || darkTheme.colors.text;
 
     return (
         <View style={[styles.container, style]}>
             <Text style={styles.label}>{labelText}</Text>
-            <BaseTextInput
-                {...{ ...props, placeholderTextColor }}
+            <ReactNativeTextInput
+                placeholderTextColor={addOpacity(darkTheme.colors.text, 0.6)}
+                selectionColor={addOpacity(darkTheme.colors.text, 0.3)}
+                {...props}
+                ref={ref}
                 style={{ ...styles.baseTextInput, ...textStyle }} />
         </View>
     );
-}
+});
+
+TextInput.displayName = "TextInput";
+export default TextInput;
 
 const styles = StyleSheet.create({
     container: {

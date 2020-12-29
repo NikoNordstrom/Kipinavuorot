@@ -1,9 +1,11 @@
-import React, { useState } from "react";
-import { View, ViewStyle, StyleSheet } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { View, ViewStyle, StyleSheet, TextInput as ReactNativeTextInput } from "react-native";
+
 import TextInput, { TextInputProps } from "./TextInput";
 import Button from "./Button";
 import { ShiftList, ShiftTime } from "../ts/shift-generator";
 import { ShiftTimeTexts } from "../App";
+import { isValidShiftTime, toShiftTime } from "../ts/tools";
 
 interface UpdateShiftListTimesProps {
     shiftList: ShiftList;
@@ -14,6 +16,8 @@ interface UpdateShiftListTimesProps {
     style?: ViewStyle;
 }
 
+type ShiftTimeTextInputName = "firstStart" | "lastEnd";
+
 export default function UpdateShiftListTimes(props: UpdateShiftListTimesProps) {
     const {
         shiftList,
@@ -23,49 +27,63 @@ export default function UpdateShiftListTimes(props: UpdateShiftListTimesProps) {
         shiftListTimesToString,
         style
     } = props;
+
     const defaultTimeText = "00:00";
 
     const shiftListTimeTexts = shiftListTimesToString(shiftList.firstShiftStartTime, shiftList.lastShiftEndTime);
-
-    const [shiftTimeTexts, setShiftTimeTexts] = useState({
-        ...shiftListTimeTexts,
-        initialValuesUpdated: false
-    });
-    const [done, setDone] = useState(false);
 
     const shiftTimesAlreadySet = (
         shiftListTimeTexts.firstStart !== defaultTimeText &&
         shiftListTimeTexts.lastEnd !== defaultTimeText
     );
 
-    if (shiftTimesAlreadySet && !shiftTimeTexts.initialValuesUpdated) {
-        setShiftTimeTexts({
-            ...shiftListTimeTexts,
-            initialValuesUpdated: true
-        });
-        setDone(true);
-    }
+    const [shiftTimeTexts, setShiftTimeTexts] = useState({
+        firstStart: firstStartDefaultText || shiftListTimeTexts.firstStart,
+        lastEnd: lastEndDefaultText || shiftListTimeTexts.lastEnd
+    });
+    const [done, setDone] = useState(shiftTimesAlreadySet);
 
-    if (done) {
-        const [startHours, startMinutes] = shiftTimeTexts.firstStart.split(":").map(text => Number.parseInt(text));
-        const [endHours, endMinutes] = shiftTimeTexts.lastEnd.split(":").map(text => Number.parseInt(text));
-        const firstShiftStartTime: ShiftTime = { hours: startHours, minutes: startMinutes };
-        const lastShiftEndTime: ShiftTime = { hours: endHours, minutes: endMinutes };
-        updateShiftListTimes(firstShiftStartTime, lastShiftEndTime);
-    }
+    const textInputRefs = {
+        firstStart: useRef<ReactNativeTextInput>(null),
+        lastEnd: useRef<ReactNativeTextInput>(null)
+    };
 
-    if (firstStartDefaultText && lastEndDefaultText && !shiftTimeTexts.initialValuesUpdated) {
-        shiftTimeTexts.firstStart = firstStartDefaultText;
-        shiftTimeTexts.lastEnd = lastEndDefaultText;
-        setShiftTimeTexts({ ...shiftTimeTexts, initialValuesUpdated: true });
-    }
+    const handleShiftTimeTexts = (shiftTime: ShiftTimeTextInputName, currentText: string) => {
+        const previousText = shiftTimeTexts[shiftTime];
+        const isInsert = currentText.length >= previousText.length;
+
+        if (currentText.length === 2 && isInsert) {
+            if (currentText.endsWith(":")) shiftTimeTexts[shiftTime] = `0${currentText}`;
+            else shiftTimeTexts[shiftTime] = `${currentText}:`;
+        }
+        else shiftTimeTexts[shiftTime] = currentText;
+
+        setShiftTimeTexts({ ...shiftTimeTexts });
+    };
+
+    useEffect(() => {
+        if (!done) return;
+
+        updateShiftListTimes(
+            toShiftTime(shiftTimeTexts.firstStart),
+            toShiftTime(shiftTimeTexts.lastEnd)
+        );
+    }, [done]);
+
+    const { firstStart, lastEnd } = shiftTimeTexts;
+
+    const firstStartFocus = firstStart === lastEnd || firstStart.length < 5;
+    const lastEndFocus = !firstStartFocus;
+
+    if (firstStartFocus) textInputRefs.firstStart.current?.focus();
+    if (lastEndFocus) textInputRefs.lastEnd.current?.focus();
 
     const validShiftTimeTexts = (() => {
-        if (shiftTimeTexts.firstStart === defaultTimeText) return false;
-        if (shiftTimeTexts.lastEnd === defaultTimeText) return false;
+        if (firstStart === lastEnd) return false;
+        if (firstStart.length !== 5 || lastEnd.length !== 5) return false;
 
-        if (shiftTimeTexts.firstStart.length !== 5) return false;
-        if (shiftTimeTexts.lastEnd.length !== 5) return false;
+        if (!isValidShiftTime(toShiftTime(firstStart))) return false;
+        if (!isValidShiftTime(toShiftTime(lastEnd))) return false;
 
         return true;
     })();
@@ -88,15 +106,17 @@ export default function UpdateShiftListTimes(props: UpdateShiftListTimesProps) {
                 <TextInput
                     { ...textInputProps }
                     labelText="Alkaa"
-                    defaultValue={firstStartDefaultText || shiftTimeTexts.firstStart}
+                    value={shiftTimeTexts.firstStart}
+                    ref={textInputRefs.firstStart}
                     style={{ ...styles.textInput, marginRight: 15 }}
-                    onChangeText={(text) => setShiftTimeTexts({ ...shiftTimeTexts, firstStart: text })} />
+                    onChangeText={currentText => handleShiftTimeTexts("firstStart", currentText)} />
                 <TextInput
                     { ...textInputProps }
                     labelText="Päättyy"
-                    defaultValue={lastEndDefaultText || shiftTimeTexts.lastEnd}
+                    value={shiftTimeTexts.lastEnd}
+                    ref={textInputRefs.lastEnd}
                     style={styles.textInput}
-                    onChangeText={(text) => setShiftTimeTexts({ ...shiftTimeTexts, lastEnd: text })} />
+                    onChangeText={currentText => handleShiftTimeTexts("lastEnd", currentText)} />
             </View>
             <Button
                 labelText="Valmis"

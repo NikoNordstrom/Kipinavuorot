@@ -287,7 +287,7 @@ export default function App() {
                 style={styles.viewPager}
                 headerInfoRef={headerInfoRef}
                 headerInfoFullHeight={state.headerInfoFullHeight}>
-                <View key="Nykyinen" style={styles.page}>
+                <View key="Nykyinen" style={styles.page} collapsable={false}>
                     {
                         !state.shiftListReady && !state.shiftListTimesUpdated
                             ? <UpdateShiftListTimes
@@ -334,7 +334,7 @@ export default function App() {
                             : null
                     }
                 </View>
-                <View key="Aiemmat" style={styles.page}>
+                <View key="Aiemmat" style={styles.page} collapsable={false}>
                     {
                         state.shiftListHistory.length > 0 && state.shiftListHistory[0].shiftLists.length > 0
                             ? <PreviousShiftLists shiftListHistory={state.shiftListHistory} />
@@ -348,8 +348,7 @@ export default function App() {
 
 const styles = StyleSheet.create({
     background: {
-        height: "100%",
-        width: "100%",
+        flex: 1,
         padding: 15,
         paddingTop: 0,
         backgroundColor: darkTheme.colors.background

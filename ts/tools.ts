@@ -19,6 +19,22 @@ export function timeFormat(shiftTime: ShiftTime) {
     return `${zeroPrefix(hours)}:${zeroPrefix(minutes)}`;
 }
 
+export function toShiftTime(shiftTimeString: string): ShiftTime {
+    const parsedShiftTimeArray = shiftTimeString.split(":").map(numberString => Number.parseInt(numberString));
+
+    return { hours: parsedShiftTimeArray[0], minutes: parsedShiftTimeArray[1] };
+}
+
+export function isValidShiftTime(shiftTime: ShiftTime) {
+    const { hours, minutes } = shiftTime;
+
+    if (isNaN(hours) || isNaN(minutes)) return false;
+    if (hours > 23 || hours < 0) return false;
+    if (minutes > 59 || minutes < 0) return false;
+
+    return true;
+}
+
 export function addOpacity(rgbString: string, opacity: number) {
     return `${rgbString.replace("rgb", "rgba").split(")")[0]}, ${opacity})`;
 }
