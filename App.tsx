@@ -17,6 +17,7 @@ import AddShiftParticipant from "./components/AddShiftParticipant";
 import Button from "./components/Button";
 import YesNoModal from "./components/YesNoModal";
 import PreviousShiftLists from "./components/PreviousShiftLists";
+import ShiftListModal from "./components/ShiftListModal";
 
 export interface ShiftTimeTexts {
     firstStart: string;
@@ -37,6 +38,10 @@ export interface State {
     generatingNewShifts: boolean;
     shiftsGenerated: boolean;
     newShiftListModalVisible: boolean;
+    shiftListModal: {
+        visible: boolean;
+        shiftList?: ShiftList;
+    };
     header: {
         title: string;
         info: string;
@@ -72,6 +77,9 @@ export default function App() {
         generatingNewShifts: false,
         shiftsGenerated: false,
         newShiftListModalVisible: false,
+        shiftListModal: {
+            visible: false
+        },
         header: {
             title: "Kipinävuorot",
             info: ""
@@ -283,6 +291,18 @@ export default function App() {
                 onNo={() => createNewShiftList(false)}
                 onRequestClose={() => updateState({ ...state, newShiftListModalVisible: false })} />
 
+            {
+                state.shiftListModal.shiftList
+                    ? <ShiftListModal
+                        visible={state.shiftListModal.visible}
+                        shiftList={state.shiftListModal.shiftList}
+                        onRequestClose={() => updateState({
+                            ...state,
+                            shiftListModal: { visible: false, shiftList: undefined }
+                        })} />
+                    : null
+            }
+
             <ViewPager
                 style={styles.viewPager}
                 headerInfoRef={headerInfoRef}
@@ -337,7 +357,12 @@ export default function App() {
                 <View key="Aiemmat" style={styles.page} collapsable={false}>
                     {
                         state.shiftListHistory.length > 0 && state.shiftListHistory[0].shiftLists.length > 0
-                            ? <PreviousShiftLists shiftListHistory={state.shiftListHistory} />
+                            ? <PreviousShiftLists
+                                shiftListHistory={state.shiftListHistory}
+                                viewShiftList={(selectedShiftList: ShiftList) => updateState({
+                                    ...state,
+                                    shiftListModal: { visible: true, shiftList: selectedShiftList }
+                                })} />
                             : <Text style={styles.noPreviousShiftListsFound}>Aiempia kipinävuoroja ei löytynyt.</Text>
                     }
                 </View>

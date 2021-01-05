@@ -15,8 +15,8 @@ function ShiftListItem(participant: ShiftParticipant) {
 
     return (
         <TouchableOpacity style={styles.listItem}>
-            <Time timeText={timeFormat(shiftStartTime)} style={styles.firstTwoColums} />
-            <Time timeText={timeFormat(shiftEndTime)} style={styles.firstTwoColums} />
+            <Time timeText={timeFormat(shiftStartTime)} style={styles.firstTwoColumns} />
+            <Time timeText={timeFormat(shiftEndTime)} style={styles.firstTwoColumns} />
             <ScrollView>
                 <Text style={styles.listItemName}>{name}</Text>
             </ScrollView>
@@ -37,8 +37,8 @@ export default function FlatShiftList(props: FlatShiftListProps) {
                 keyExtractor={({ name }, index) => `${name}${index}`}
                 ListHeaderComponent={
                     <View style={styles.header}>
-                        <Text style={[styles.firstTwoColums, styles.headerItem]}>Alkaa</Text>
-                        <Text style={[styles.firstTwoColums, styles.headerItem]}>Päättyy</Text>
+                        <Text style={[styles.firstTwoColumns, styles.headerItem]}>Alkaa</Text>
+                        <Text style={[styles.firstTwoColumns, styles.headerItem]}>Päättyy</Text>
                         <Text style={styles.headerItem}>Nimi</Text>
                     </View>
                 } />
@@ -56,8 +56,9 @@ const styles = StyleSheet.create({
         fontFamily: "Quicksand-Medium",
         color: darkTheme.colors.text
     },
-    firstTwoColums: {
-        flexBasis: "17.5%",
+    firstTwoColumns: {
+        width: "18%",
+        minWidth: 60,
         marginRight: 10
     },
     listItem: {

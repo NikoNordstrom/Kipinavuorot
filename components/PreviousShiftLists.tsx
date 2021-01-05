@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, SectionList, View, Text } from "react-native";
+import { StyleSheet, SectionList, View, Text, Pressable } from "react-native";
 
 import { ShiftList } from "../ts/shift-generator";
 import { ShiftListHistory } from "../App";
@@ -9,28 +9,39 @@ import Time from "./Time";
 
 interface PreviousShiftListsProps {
     shiftListHistory: ShiftListHistory[];
+    viewShiftList: (selectedShiftList: ShiftList) => void;
 }
 
 interface ShiftListHistoryItemProps {
     shiftList: ShiftList;
+    viewShiftList: (selectedShiftList: ShiftList) => void;
 }
 
 function ShiftListHistoryItem(props: ShiftListHistoryItemProps) {
-    const { shiftList } = props;
+    const { shiftList, viewShiftList } = props;
 
     const shiftTimeText = `${timeFormat(shiftList.firstShiftStartTime)} - ${timeFormat(shiftList.lastShiftEndTime)}`;
-    const shiftDateText = `${shiftList.timestamp ? ` (${dateFormat(shiftList.timestamp)})` : ""}`;
+    const shiftDateText = `${shiftList.timestamp ? `${dateFormat(shiftList.timestamp)}` : ""}`;
 
     return (
-        <View style={styles.item}>
-            <Time timeText={`${shiftTimeText}${shiftDateText}`} style={styles.itemTitle} />
-            <Text style={styles.itemInfo}>{shiftList.participants.length} osallistujaa</Text>
+        <View style={styles.pressableContainer}>
+            <Pressable
+                onPress={() => viewShiftList(shiftList)}
+                android_disableSound={true}
+                android_ripple={{
+                    color: addOpacity(darkTheme.colors.text, 0.2)
+                }}>
+                <View style={styles.item}>
+                    <Time timeText={shiftDateText} style={styles.itemTitle} />
+                    <Text style={styles.itemInfo}>{shiftList.participants.length} vuoroa ({shiftTimeText})</Text>
+                </View>
+            </Pressable>
         </View>
     );
 }
 
 export default function PreviousShiftLists(props: PreviousShiftListsProps) {
-    const { shiftListHistory } = props;
+    const { shiftListHistory, viewShiftList } = props;
 
     const DATA = shiftListHistory.map(({ title, shiftLists, currentlySelected }) => ({
         title,
@@ -45,7 +56,7 @@ export default function PreviousShiftLists(props: PreviousShiftListsProps) {
                 keyExtractor={({ timestamp }, index) => (
                     timestamp ? timestamp : "" + index
                 )}
-                renderItem={({ item }) => <ShiftListHistoryItem shiftList={item} />}
+                renderItem={({ item }) => <ShiftListHistoryItem shiftList={item} viewShiftList={viewShiftList} />}
                 renderSectionHeader={({ section: { title, currentlySelected } }) => (
                     <View>
                         <Time
@@ -67,13 +78,18 @@ const styles = StyleSheet.create({
         textDecorationLine: "underline"
     },
     headerTitle: {
+        alignSelf: "center",
         marginVertical: 5,
         fontFamily: "Quicksand-Bold",
-        fontSize: 17.5,
+        fontSize: 20,
         color: darkTheme.colors.text
     },
-    item: {
+    pressableContainer: {
         marginBottom: 10,
+        overflow: "hidden",
+        borderRadius: 10
+    },
+    item: {
         paddingVertical: 10,
         paddingHorizontal: 15,
         borderWidth: 1,

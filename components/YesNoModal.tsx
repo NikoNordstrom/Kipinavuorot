@@ -1,6 +1,7 @@
 import React from "react";
-import { Modal, View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
+import Modal from "./Modal";
 import Button from "./Button";
 import { darkTheme } from "../ts/themes";
 
@@ -18,44 +19,25 @@ export default function YesNoModal(props: Props) {
 
     return (
         <Modal
-            animationType="fade"
-            transparent={true}
             visible={visible}
             onRequestClose={onRequestClose}>
-            <View style={styles.centeredView}>
-                <View style={styles.modalView}>
-                    <Text style={styles.modalTitle}>{title}</Text>
-                    <Text style={styles.modalText}>{text}</Text>
-                    <View style={styles.modalButtonContainer}>
-                        <Button
-                            style={{ flex: 1, marginRight: 15 }}
-                            labelText="Kyllä"
-                            onPress={onYes} />
-                        <Button
-                            style={{ flex: 1 }}
-                            labelText="Ei"
-                            onPress={onNo} />
-                    </View>
-                </View>
+            <Text style={styles.modalTitle}>{title}</Text>
+            <Text style={styles.modalText}>{text}</Text>
+            <View style={styles.modalButtonContainer}>
+                <Button
+                    style={{ flex: 1, marginRight: 15 }}
+                    labelText="Kyllä"
+                    onPress={onYes} />
+                <Button
+                    style={{ flex: 1 }}
+                    labelText="Ei"
+                    onPress={onNo} />
             </View>
         </Modal>
     );
 }
 
 const styles = StyleSheet.create({
-    centeredView: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.4)"
-    },
-    modalView: {
-        margin: 30,
-        padding: 20,
-        borderRadius: 10,
-        backgroundColor: darkTheme.colors.card,
-        elevation: 5
-    },
     modalTitle: {
         marginBottom: 5,
         fontSize: 25,
