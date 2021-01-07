@@ -27,13 +27,10 @@ function ShiftListHistoryItem(props: ShiftListHistoryItemProps) {
         <View style={styles.pressableContainer}>
             <Pressable
                 onPress={() => viewShiftList(shiftList)}
-                android_disableSound={true}
-                android_ripple={{
-                    color: addOpacity(darkTheme.colors.text, 0.2)
-                }}>
+                android_ripple={{ color: addOpacity(darkTheme.colors.text, 0.2) }}>
                 <View style={styles.item}>
                     <Time timeText={shiftDateText} style={styles.itemTitle} />
-                    <Text style={styles.itemInfo}>{shiftList.participants.length} vuoroa ({shiftTimeText})</Text>
+                    <Text style={styles.itemInfo}>{shiftTimeText}{"\u2004\u2022\u2004"}{shiftList.participants.length} vuoroa</Text>
                 </View>
             </Pressable>
         </View>
@@ -68,6 +65,7 @@ export default function PreviousShiftLists(props: PreviousShiftListsProps) {
                             ]} />
                     </View>
                 )}
+                keyboardShouldPersistTaps="handled"
             />
         </View>
     );

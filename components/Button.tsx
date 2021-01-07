@@ -1,48 +1,46 @@
 import React from "react";
-import { TouchableHighlight, ViewStyle, View, Text, StyleSheet } from "react-native";
+import { Pressable, ViewStyle, View, Text, StyleSheet } from "react-native";
 
 import { darkTheme } from "../ts/themes";
 
 interface ButtonProps {
     labelText: string;
     disabled?: boolean;
-    color?: "green" | "red";
     style?: ViewStyle;
-    onPress?: () => void;
+    onPress: () => void;
 }
 
 export default function Button(props: ButtonProps) {
-    const { labelText, disabled, color, style, onPress } = props;
+    const { labelText, disabled, style, onPress } = props;
 
     return (
-        <View style={[style, styles.highlight, styles.highlightContainer]}>
-            <TouchableHighlight
+        <View style={[styles.pressableContainer, { opacity: disabled ? 0.5 : 1 }, style]}>
+            <Pressable
+                onPress={() => onPress()}
                 disabled={disabled}
-                touchSoundDisabled={disabled}
-                style={[styles.highlight, { opacity: disabled ? 0.5 : 1 }]}
-                onPress={onPress}>
-                <View style={[{ backgroundColor: color === "red" ? "#e63946" : darkTheme.colors.primary }, styles.button]}>
+                android_disableSound={disabled}
+                android_ripple={{ color: "rgba(0, 0, 0, 0.25)" }}>
+                <View style={styles.button}>
                     <Text style={styles.labelText}>{labelText}</Text>
                 </View>
-            </TouchableHighlight>
+            </Pressable>
         </View>
     );
 }
 
-const height = 40;
+const HEIGHT = 40;
 
 const styles = StyleSheet.create({
-    highlightContainer: {
-        backgroundColor: "black"
-    },
-    highlight: {
-        borderRadius: height / 2
+    pressableContainer: {
+        overflow: "hidden",
+        borderRadius: HEIGHT / 2,
+        backgroundColor: darkTheme.colors.primary
     },
     button: {
-        height,
+        height: HEIGHT,
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: height / 2
+        borderRadius: HEIGHT / 2
     },
     labelText: {
         includeFontPadding: false,

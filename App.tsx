@@ -283,18 +283,22 @@ export default function App() {
                 }
             </View>
 
-            <YesNoModal
-                visible={state.newShiftListModalVisible}
-                title="Uusi lista"
-                text="Tuleeko uuteen listaan samat osallistujat?"
-                onYes={() => createNewShiftList(true)}
-                onNo={() => createNewShiftList(false)}
-                onRequestClose={() => updateState({ ...state, newShiftListModalVisible: false })} />
+            {
+                state.newShiftListModalVisible
+                    ? <YesNoModal
+                        visible={true}
+                        title="Uusi lista"
+                        text="Tuleeko uuteen listaan samat osallistujat?"
+                        onYes={() => createNewShiftList(true)}
+                        onNo={() => createNewShiftList(false)}
+                        onRequestClose={() => updateState({ ...state, newShiftListModalVisible: false })} />
+                    : null
+            }
 
             {
                 state.shiftListModal.shiftList
                     ? <ShiftListModal
-                        visible={state.shiftListModal.visible}
+                        visible={true}
                         shiftList={state.shiftListModal.shiftList}
                         onRequestClose={() => updateState({
                             ...state,

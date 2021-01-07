@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, FlatList, TouchableOpacity, Text, View, ViewStyle, ScrollView } from "react-native";
+import { StyleSheet, FlatList, Text, View, ViewStyle, ScrollView } from "react-native";
 
 import { ShiftParticipant, ShiftList } from "../ts/shift-generator";
 import { darkTheme } from "../ts/themes";
@@ -14,13 +14,13 @@ function ShiftListItem(participant: ShiftParticipant) {
     const { name, shiftStartTime, shiftEndTime } = participant;
 
     return (
-        <TouchableOpacity style={styles.listItem}>
+        <View style={styles.listItem}>
             <Time timeText={timeFormat(shiftStartTime)} style={styles.firstTwoColumns} />
             <Time timeText={timeFormat(shiftEndTime)} style={styles.firstTwoColumns} />
             <ScrollView>
                 <Text style={styles.listItemName}>{name}</Text>
             </ScrollView>
-        </TouchableOpacity>
+        </View>
     );
 }
 
