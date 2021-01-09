@@ -1,6 +1,6 @@
 import generateShifts, { ShiftList, ShiftTime } from "../ts/shift-generator";
 
-const _participantsNames = ["a", "b", "c", "d", "e", "f", "g", "h"];
+const _participantsNames = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n"];
 
 const _baseShiftList: ShiftList = {
     firstShiftStartTime: { hours: 22, minutes: 0 },
@@ -30,6 +30,21 @@ function generateShiftListHistory(listCount: number): ShiftList[] {
 describe("generated shiftlist is valid when", () => {
     const shiftList: ShiftList = JSON.parse(baseShiftListString);
     const generatedShiftList = generateShifts(shiftList, []);
+    
+    const allShiftsDurationInMinutes = generatedShiftList.participants.map(({ shiftStartTime, shiftEndTime }) => {
+        const shiftStartTimeDate = new Date();
+        const shiftEndTimeDate = new Date();
+
+        shiftStartTimeDate.setHours(shiftStartTime.hours, shiftStartTime.minutes, 0, 0);
+        shiftEndTimeDate.setHours(shiftEndTime.hours, shiftEndTime.minutes, 0, 0);
+
+        // If shiftEndTimeDate will be on the next day then set the correct date for that.
+        if (shiftEndTimeDate.getHours() < shiftStartTimeDate.getHours()) {
+            shiftEndTimeDate.setDate(shiftEndTimeDate.getDate() + 1);
+        }
+        
+        return (shiftEndTimeDate.getTime() - shiftStartTimeDate.getTime()) / 1000 / 60;
+    });
 
     test("it includes all participants names", () => {
         const shiftListParticipantsNames = shiftList.participants.map(({ name }) => name);
@@ -62,6 +77,22 @@ describe("generated shiftlist is valid when", () => {
         });
         
         expect(allShiftTimesAreCorrect).toEqual(true);
+    });
+
+    test("participants shift durations are correct length", () => {
+        const allShiftDurationsAreCorrectLength = allShiftsDurationInMinutes
+            .every(durationInMinutes => allShiftsDurationInMinutes.every(anotherDurationInMinutes => {
+                return [0, 5].includes(Math.abs(durationInMinutes - anotherDurationInMinutes));
+            }));
+
+        expect(allShiftDurationsAreCorrectLength).toBeTruthy();
+    });
+
+    test("participants shift duration is divisible by 5", () => {
+        const allShiftDurationsAreDivisibleBy5 = allShiftsDurationInMinutes
+            .every(durationInMinutes => durationInMinutes % 5 === 0);
+
+        expect(allShiftDurationsAreDivisibleBy5).toBeTruthy();
     });
 
     test("it has valid timestamp", () => expect(Date.parse(generatedShiftList.timestamp || "")).toBeTruthy());

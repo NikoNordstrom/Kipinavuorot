@@ -20,43 +20,21 @@ export interface ShiftList {
 function roundShiftMinutesToFive(shiftParticipants: ShiftParticipant[]): ShiftParticipant[] {
     const newShiftParticipants: ShiftParticipant[] = JSON.parse(JSON.stringify(shiftParticipants));
 
-    let allExtraMinutes = 0;
+    // Round all participants shiftEndTime.minutes.
+    // Also sets next participants shiftStartTime property to equal current participants shiftEndTime property.
+    for (let i = 0; i < newShiftParticipants.length - 1; i++) {
+        const roundedMinutes = Math.ceil(newShiftParticipants[i].shiftEndTime.minutes / 5) * 5;
+        newShiftParticipants[i].shiftEndTime.minutes = roundedMinutes;
 
-    // Calculate all extra minutes and remove extra minutes from participants shiftEndTime.minutes property.
-    // This also sets the current participants shiftEndTime to equal the next participants shiftStartTime
-    // (except if the current participant is the last participant) so that when we change
-    // the current participants shiftEndTime property it also changes the next participants shiftStartTime property.
-    for (let i = 0; i < newShiftParticipants.length; i++) {
-        const extraMinutes = newShiftParticipants[i].shiftEndTime.minutes % 5;
-        allExtraMinutes += extraMinutes;
+        newShiftParticipants[i + 1].shiftStartTime = newShiftParticipants[i].shiftEndTime;
 
-        if (i === newShiftParticipants.length - 1) break;
-        newShiftParticipants[i].shiftEndTime = newShiftParticipants[i + 1].shiftStartTime;
-        newShiftParticipants[i].shiftEndTime.minutes -= extraMinutes;
-    }
+        // If roundedMinutes is 60 we need to increment newShiftParticipants[i].shiftEndTime.hours.
+        if (roundedMinutes < 60) continue;
 
-    // Add minutes to allExtraMinutes so that it becomes divisible by 5.
-    if (allExtraMinutes % 5 !== 0) allExtraMinutes += 5 - allExtraMinutes % 5;
+        newShiftParticipants[i].shiftEndTime.minutes = roundedMinutes % 60;
+        const newShiftEndHours = newShiftParticipants[i].shiftEndTime.hours += Math.floor(roundedMinutes / 60);
 
-    let participantIndex = 0;
-
-    // Loop through newShiftParticipants and add 5 minutes to current participants shiftEndTime.minutes
-    // and substract 5 from allExtraMinutes until its value is 0. Skip the last participant to the first participant.
-    // This also corrects shiftEndTime.hours and shiftEndTime.minutes values if necessary.
-    while (allExtraMinutes / 5 > 0) {
-        if (participantIndex === newShiftParticipants.length - 1) participantIndex = 0;
-
-        const newShiftEndMinutes = newShiftParticipants[participantIndex].shiftEndTime.minutes += 5;
-        allExtraMinutes -= 5;
-
-        if (newShiftEndMinutes >= 60) {
-            newShiftParticipants[participantIndex].shiftEndTime.minutes = 0;
-            const newShiftEndHours = newShiftParticipants[participantIndex].shiftEndTime.hours += 1;
-
-            if (newShiftEndHours === 24) newShiftParticipants[participantIndex].shiftEndTime.hours = 0;
-        }
-
-        participantIndex++;
+        if (newShiftEndHours >= 24) newShiftParticipants[i].shiftEndTime.hours = newShiftEndHours % 24;
     }
 
     return newShiftParticipants;
@@ -75,12 +53,12 @@ function generateEmptyShifts(shiftList: ShiftList): ShiftParticipant[] {
         lastShiftEndTime.setDate(lastShiftEndTime.getDate() + 1);
     }
 
-    const fullShiftLengthHours = Math.abs(firstShiftStartTime.getTime() - lastShiftEndTime.getTime()) / 1000 / 60 / 60;
-    const shiftDurationMinutes = fullShiftLengthHours / shiftList.participants.length * 60;
+    const fullShiftLengthInMinutes = Math.abs(firstShiftStartTime.getTime() - lastShiftEndTime.getTime()) / 1000 / 60;
+    const shiftDurationInMinutes = fullShiftLengthInMinutes / shiftList.participants.length;
 
     // Create ShiftParticipant array that includes all shift start and end times, but leave participant names empty.
     const newShiftParticipantArray: ShiftParticipant[] = new Array(shiftList.participants.length).fill(null).map((value, index) => {
-        const lastShiftEndTimeMinutes = (firstShiftStartTime.getHours() * 60 + firstShiftStartTime.getMinutes()) + shiftDurationMinutes * index;
+        const lastShiftEndTimeMinutes = (firstShiftStartTime.getHours() * 60 + firstShiftStartTime.getMinutes()) + shiftDurationInMinutes * index;
         return {
             name: "",
             shiftStartTime: {
@@ -88,8 +66,8 @@ function generateEmptyShifts(shiftList: ShiftList): ShiftParticipant[] {
                 minutes: Math.floor(lastShiftEndTimeMinutes % 60)
             },
             shiftEndTime: {
-                hours: Math.floor((lastShiftEndTimeMinutes + shiftDurationMinutes) / 60) % 24,
-                minutes: Math.floor((lastShiftEndTimeMinutes + shiftDurationMinutes) % 60)
+                hours: Math.floor((lastShiftEndTimeMinutes + shiftDurationInMinutes) / 60) % 24,
+                minutes: Math.floor((lastShiftEndTimeMinutes + shiftDurationInMinutes) % 60)
             }
         };
     });
