@@ -85,7 +85,8 @@ const styles = StyleSheet.create({
     pressableContainer: {
         marginBottom: 10,
         overflow: "hidden",
-        borderRadius: 10
+        borderRadius: 10,
+        backgroundColor: darkTheme.colors.fillLight
     },
     item: {
         paddingVertical: 10,
